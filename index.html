@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>NewsFlash · Modular News Hub</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fb;
+      color: #1e293b;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .site-header {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(0px);
+      border-bottom: 1px solid #eef2f6;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      gap: 16px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .logo-icon {
+      background: #2563eb;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 0 6px 12px -6px rgba(37, 99, 235, 0.25);
+    }
+
+    .logo-text h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #1e293b, #2563eb);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .logo-text span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #5b6e8c;
+    }
+
+    .date-badge {
+      background: #eef2ff;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1e40af;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-bar {
+      background: white;
+      border-radius: 28px;
+      margin: 28px 0 24px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+      border: 1px solid #eef2f6;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .search-wrapper {
+      flex: 2;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border-radius: 60px;
+      padding: 4px 12px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    .search-wrapper:focus-within {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      background: white;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    #clearSearchBtn {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #94a3b8;
+      padding: 0 8px;
+    }
+    .reset-filters-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+    .reset-filters-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .categories-wrap {
+      margin-bottom: 28px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .cat-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cat-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #334155;
+    }
+    .cat-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+    .cat-btn:hover:not(.active) {
+      background: #f1f5f9;
+    }
+
+    /* News Grid */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 28px;
+      margin: 28px 0 48px;
+    }
+
+    .news-card {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      transition: all 0.25s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border: 1px solid #edf2f7;
+      display: flex;
+      flex-direction: column;
+    }
+    .news-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.12);
+    }
+    .card-img {
+      height: 190px;
+      overflow: hidden;
+      background: #eef2ff;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .news-card:hover .card-img img {
+      transform: scale(1.03);
+    }
+    .card-content {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .meta-cat {
+      background: #eef2ff;
+      color: #1e40af;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 30px;
+      width: fit-content;
+      margin-bottom: 14px;
+    }
+    .news-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0f172a;
+      line-height: 1.35;
+    }
+    .news-desc {
+      color: #475569;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      line-height: 1.45;
+      flex: 1;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #f0f2f5;
+      padding-top: 14px;
+    }
+    .date-info {
+      font-size: 0.75rem;
+      color: #6c86a3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .read-btn {
+      background: none;
+      border: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #2563eb;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+    .read-btn:hover {
+      gap: 10px;
+      color: #1e40af;
+    }
+    .no-results {
+      text-align: center;
+      padding: 60px;
+      background: white;
+      border-radius: 40px;
+      color: #5b6e8c;
+    }
+
+    /* Full Article Page Styles */
+    .full-article-page {
+      display: none;
+      background: white;
+      border-radius: 32px;
+      margin: 28px 0;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .full-article-page.active {
+      display: block;
+    }
+
+    .full-article-page img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-radius: 24px;
+      margin: 20px 0;
+    }
+
+    .full-article-page h1 {
+      font-size: 2.2rem;
+      color: #0f172a;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .full-article-meta {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .full-article-meta span {
+      background: #eef2ff;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .full-article-meta .cat-news {
+      background: #2563eb;
+      color: white;
+    }
+
+    .full-article-content {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #334155;
+    }
+
+    .full-article-content p {
+      margin-bottom: 20px;
+    }
+
+    .back-to-news {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .back-to-news:hover {
+      background: #e2e8f0;
+      gap: 12px;
+    }
+
+    .news-grid.hide {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      border-top: 1px solid #e2e8f0;
+      background: white;
+      padding: 28px 0;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #5b6e8c;
+    }
+
+    @media (max-width: 768px) {
+      .full-article-page {
+        padding: 20px;
+      }
+      .full-article-page h1 {
+        font-size: 1.6rem;
+      }
+      .full-article-content {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="container header-flex">
+    <div class="logo-area" id="homeLogo">
+      <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
+      <div class="logo-text">
+        <h1>NewsFlash</h1>
+        <span>modular · easy updates</span>
+      </div>
+    </div>
+    <div class="date-badge">
+      <i class="far fa-calendar-alt"></i>
+      <span id="liveDate"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="action-bar">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search news...">
+      <button id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
+    </div>
+    <button id="resetAllBtn" class="reset-filters-btn"><i class="fas fa-sliders-h"></i> Reset filters</button>
+  </div>
+
+  <div class="categories-wrap" id="categoriesWrap">
+    <div id="categoryContainer" class="cat-buttons"></div>
+  </div>
+
+  <!-- News Grid -->
+  <div id="newsGridContainer" class="news-grid"></div>
+
+  <!-- Full Article Page (hidden by default) -->
+  <div id="fullArticlePage" class="full-article-page">
+    <button class="back-to-news" id="backToNewsBtn">
+      <i class="fas fa-arrow-left"></i> Back to all news
+    </button>
+    <img id="fullArticleImage" src="" alt="">
+    <h1 id="fullArticleTitle"></h1>
+    <div class="full-article-meta">
+      <span id="fullArticleCategory"></span>
+      <span id="fullArticleDate"></span>
+    </div>
+    <div id="fullArticleContent" class="full-article-content"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p><i class="far fa-edit"></i> Edit <strong>js/data.js</strong> → add a new object to the array. Easy daily news!</p>
+    <p style="margin-top: 8px;">© 2025 NewsFlash — modular & fresh</p>
+  </div>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
