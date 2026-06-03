@@ -189,6 +189,41 @@
       background: #f1f5f9;
     }
 
+    /* Ad Container Styles */
+    .ad-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0 30px;
+      padding: 10px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid #eef2f6;
+      overflow-x: auto;
+    }
+    
+    .ad-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-align: center;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Bottom Ad */
+    .ad-container-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 30px 0 20px;
+      padding: 10px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border: 1px solid #eef2f6;
+    }
+
     /* News Grid */
     .news-grid {
       display: grid;
@@ -389,6 +424,7 @@
       text-align: center;
       font-size: 0.85rem;
       color: #5b6e8c;
+      margin-top: 40px;
     }
 
     @media (max-width: 768px) {
@@ -400,6 +436,12 @@
       }
       .full-article-content {
         font-size: 1rem;
+      }
+      .ad-container iframe,
+      .ad-container-bottom iframe {
+        width: 100%;
+        height: auto;
+        min-height: 90px;
       }
     }
   </style>
@@ -436,8 +478,42 @@
     <div id="categoryContainer" class="cat-buttons"></div>
   </div>
 
+  <!-- Adsterra Ad - Top (Below Categories) -->
+  <div class="ad-container">
+    <div style="text-align: center; width: 100%;">
+      <div class="ad-label">— Advertisement —</div>
+      <script>
+        atOptions = {
+          'key' : 'ca3013086a4b100db14a5daddf891044',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/ca3013086a4b100db14a5daddf891044/invoke.js"></script>
+    </div>
+  </div>
+
   <!-- News Grid -->
   <div id="newsGridContainer" class="news-grid"></div>
+
+  <!-- Adsterra Ad - Bottom (Below News Grid) -->
+  <div class="ad-container-bottom">
+    <div style="text-align: center; width: 100%;">
+      <div class="ad-label">— Advertisement —</div>
+      <script>
+        atOptions = {
+          'key' : 'ca3013086a4b100db14a5daddf891044',
+          'format' : 'iframe',
+          'height' : 90,
+          'width' : 728,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/ca3013086a4b100db14a5daddf891044/invoke.js"></script>
+    </div>
+  </div>
 
   <!-- Full Article Page (hidden by default) -->
   <div id="fullArticlePage" class="full-article-page">
