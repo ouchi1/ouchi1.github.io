@@ -150,7 +150,6 @@ export const articles = [
     alt: "US China trade deal agreement"
   }
 ];
-];
 
 export function addArticle(newArticle) {
   if (!newArticle.id) {
