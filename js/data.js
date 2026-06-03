@@ -82,7 +82,82 @@ export const articles = [
     date: "2026-06-02",
     imageUrl: "https://picsum.photos/id/77/400/240",
     alt: "Border security"
-  }
+  },
+  {
+
+  id: 9,
+  title: "Debate Over Donald Trump's Long-Term Legacy Continues Across America",
+  description: "A recent survey highlights ongoing divisions over how future generations may judge Donald Trump's presidency.",
+  fullContent: "Public discussion surrounding the long-term legacy of former U.S. President Donald Trump has intensified following the release of a recent political survey examining how future generations may view his time in office.\n\nSupporters frequently point to economic initiatives, tax reforms, judicial appointments, border security efforts, and foreign policy decisions as major accomplishments that shaped the nation during his presidency. Many believe these policies will have a lasting impact on American politics for decades to come.\n\nCritics, however, argue that Trump's administration was marked by significant controversies, political polarization, and challenges to democratic institutions. They contend that these issues will remain central to historical assessments of his leadership.\n\nThe survey reflects the continuing divide in public opinion regarding Trump's influence on the United States. While some Americans view his presidency as transformative and consequential, others see it as one of the most controversial periods in modern political history.\n\nAs political debates continue and future elections shape the nation's direction, historians, political analysts, and citizens alike are expected to continue examining Trump's role and legacy in American history for years to come.",
+  category: "Politics",
+  date: "2026-06-04",
+  imageUrl: "IMG/ID_9.png",
+  alt: "Discussion surrounding the long-term legacy of Donald Trump"
+
+  },
+  {
+  id: 10,
+  title: "Experts Debate How AI Will Transform Jobs and Daily Life by 2030",
+  description: "Artificial intelligence is rapidly changing workplaces and global industries.",
+  category: "Technology",
+  date: "2026-06-04",
+  imageUrl: "IMG/10.jpg",
+  alt: "Artificial Intelligence and robotics"
+},
+{
+  id: 11,
+  title: "Rising Living Costs Continue to Impact Families Worldwide",
+  description: "Inflation and economic pressure remain major global concerns.",
+  category: "Business",
+  date: "2026-06-04",
+  imageUrl: "IMG/11.jpg",
+  alt: "Economy and rising cost of living"
+},
+{
+  id: 12,
+  title: "Political Debate Continues Over U.S. Leadership and Policy Direction",
+  description: "Experts and citizens remain divided on recent political developments.",
+  category: "Politics",
+  date: "2026-06-04",
+  imageUrl: "IMG/12.jpg",
+  alt: "United States politics discussion"
+},
+{
+  id: 13,
+  title: "Fans Worldwide Prepare for the Upcoming FIFA World Cup",
+  description: "The biggest football event is expected to attract global attention.",
+  category: "Sports",
+  date: "2026-06-04",
+  imageUrl: "img/13.jpg",
+  alt: "Football stadium and crowd"
+},
+{
+  id: 14,
+  title: "Countries Accelerate Renewable Energy and Climate Action Plans",
+  description: "Global efforts increase toward clean energy and environmental protection.",
+  category: "Environment",
+  date: "2026-06-04",
+  imageUrl: "img/14.jpg",
+  alt: "Renewable energy and climate action"
+},
+{
+  id: 15,
+  title: "Donald Trump and Congressional Leader Seen in Formal Political Meeting Sparks Online Debate",
+  description: "A political-style graphic shows Donald Trump in a formal meeting setting, prompting discussion on presidential legacy and public opinion.",
+  category: "Politics",
+  date: "2026-06-04",
+  imageUrl: "img/15.jpg",
+  alt: "Donald Trump political meeting graphic with congressional leader and headline text"
+},
+{
+  id: 16,
+  title: "Grandson Shares Emotional Story Praising Hard Work and Dedication of Former President Trump",
+  description: "A 60-year-old man shares his personal reflections about President Trump’s work ethic and dedication, expressing admiration for his continued public service and calling for prayers and blessings for his health and strength.",
+  category: "Opinion",
+  date: "2026-06-04",
+  imageUrl: "img/16.jpg",
+  alt: "American flag and political background representing leadership and national politics"
+}
 ];
 
 // ==================== TEMPLATE FOR NEW ARTICLE ====================
