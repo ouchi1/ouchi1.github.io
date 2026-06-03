@@ -78,7 +78,7 @@ export const articles = [
     date: "2025-06-01",
     imageUrl: "https://picsum.photos/id/83/400/240",
     alt: "Mars space mission"
-  }
+  },
     {
     id: 9,
     title: "Trump Administration Unveils $500 Billion Infrastructure Plan 'America First Roads'",
