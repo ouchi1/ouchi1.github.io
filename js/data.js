@@ -128,7 +128,7 @@ export const articles = [
   description: "The biggest football event is expected to attract global attention.",
   category: "Sports",
   date: "2026-06-04",
-  imageUrl: "IMG/13.jpg",
+  imageUrl: "img/13.jpg",
   alt: "Football stadium and crowd"
 },
 {
@@ -137,7 +137,7 @@ export const articles = [
   description: "Global efforts increase toward clean energy and environmental protection.",
   category: "Environment",
   date: "2026-06-04",
-  imageUrl: "IMG/14.jpg",
+  imageUrl: "img/14.jpg",
   alt: "Renewable energy and climate action"
 },
 {
@@ -146,7 +146,7 @@ export const articles = [
   description: "A political-style graphic shows Donald Trump in a formal meeting setting, prompting discussion on presidential legacy and public opinion.",
   category: "Politics",
   date: "2026-06-04",
-  imageUrl: "IMG/15.jpg",
+  imageUrl: "img/15.jpg",
   alt: "Donald Trump political meeting graphic with congressional leader and headline text"
 },
 {
@@ -155,9 +155,19 @@ export const articles = [
   description: "A 60-year-old man shares his personal reflections about President Trump’s work ethic and dedication, expressing admiration for his continued public service and calling for prayers and blessings for his health and strength.",
   category: "Opinion",
   date: "2026-06-04",
-  imageUrl: "IMG/16.jpg",
+  imageUrl: "img/16.jpg",
   alt: "American flag and political background representing leadership and national politics"
-}
+},
+  {
+    id: 17,
+    title: "Freedom 250 Faces Scrutiny Over Funding and Corporate Involvement",
+    description: "The Freedom 250 initiative is under scrutiny from watchdog groups and lawmakers over its public-private funding model and involvement of major tech and defense contractors including Oracle, Palantir, Deloitte, and Lockheed Martin.",
+    category: "Politics",
+    date: "2026-06-04",
+    imageUrl: "IMG/17.jpg",
+    alt: "Government and politics concept image"
+  }
+
 ];
 
 // ==================== TEMPLATE FOR NEW ARTICLE ====================
