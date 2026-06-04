@@ -411,7 +411,7 @@ body {
   font-family: inherit;
 }
 
-.news-grid.hide, .categories-wrap.hide, .action-bar.hide {
+.news-grid.hide, .cat-buttons.hide, .action-bar.hide {
   display: none;
 }
 
