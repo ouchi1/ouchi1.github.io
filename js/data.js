@@ -91,7 +91,7 @@ export const articles = [
   fullContent: "Public discussion surrounding the long-term legacy of former U.S. President Donald Trump has intensified following the release of a recent political survey examining how future generations may view his time in office.\n\nSupporters frequently point to economic initiatives, tax reforms, judicial appointments, border security efforts, and foreign policy decisions as major accomplishments that shaped the nation during his presidency. Many believe these policies will have a lasting impact on American politics for decades to come.\n\nCritics, however, argue that Trump's administration was marked by significant controversies, political polarization, and challenges to democratic institutions. They contend that these issues will remain central to historical assessments of his leadership.\n\nThe survey reflects the continuing divide in public opinion regarding Trump's influence on the United States. While some Americans view his presidency as transformative and consequential, others see it as one of the most controversial periods in modern political history.\n\nAs political debates continue and future elections shape the nation's direction, historians, political analysts, and citizens alike are expected to continue examining Trump's role and legacy in American history for years to come.",
   category: "Politics",
   date: "2026-06-04",
-  imageUrl: "IMG/ID_9.png",
+  imageUrl: "img/ID_9.png",
   alt: "Discussion surrounding the long-term legacy of Donald Trump"
 
   },
@@ -101,7 +101,7 @@ export const articles = [
   description: "Artificial intelligence is rapidly changing workplaces and global industries.",
   category: "Technology",
   date: "2026-06-04",
-  imageUrl: "IMG/10.jpg",
+  imageUrl: "img/10.jpg",
   alt: "Artificial Intelligence and robotics"
 },
 {
@@ -110,7 +110,7 @@ export const articles = [
   description: "Inflation and economic pressure remain major global concerns.",
   category: "Business",
   date: "2026-06-04",
-  imageUrl: "IMG/11.jpg",
+  imageUrl: "img/11.jpg",
   alt: "Economy and rising cost of living"
 },
 {
@@ -119,7 +119,7 @@ export const articles = [
   description: "Experts and citizens remain divided on recent political developments.",
   category: "Politics",
   date: "2026-06-04",
-  imageUrl: "IMG/12.jpg",
+  imageUrl: "img/12.jpg",
   alt: "United States politics discussion"
 },
 {
@@ -128,7 +128,7 @@ export const articles = [
   description: "The biggest football event is expected to attract global attention.",
   category: "Sports",
   date: "2026-06-04",
-  imageUrl: "IMG/13.jpg",
+  imageUrl: "img/13.jpg",
   alt: "Football stadium and crowd"
 },
 {
@@ -137,7 +137,7 @@ export const articles = [
   description: "Global efforts increase toward clean energy and environmental protection.",
   category: "Environment",
   date: "2026-06-04",
-  imageUrl: "IMG/14.jpg",
+  imageUrl: "img/14.jpg",
   alt: "Renewable energy and climate action"
 },
 {
@@ -146,7 +146,7 @@ export const articles = [
   description: "A political-style graphic shows Donald Trump in a formal meeting setting, prompting discussion on presidential legacy and public opinion.",
   category: "Politics",
   date: "2026-06-04",
-  imageUrl: "IMG/15.jpg",
+  imageUrl: "img/15.jpg",
   alt: "Donald Trump political meeting graphic with congressional leader and headline text"
 },
 {
@@ -164,7 +164,7 @@ export const articles = [
     description: "The Freedom 250 initiative is under scrutiny from watchdog groups and lawmakers over its public-private funding model and involvement of major tech and defense contractors including Oracle, Palantir, Deloitte, and Lockheed Martin.",
     category: "Politics",
     date: "2026-06-04",
-    imageUrl: "IMG/17.jpg",
+    imageUrl: "img/17.jpg",
     alt: "Government and politics concept image"
   }
 
