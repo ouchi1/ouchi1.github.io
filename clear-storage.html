@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Storage</title>
+</head>
+<body>
+    <h1>Click button to fix 404 errors</h1>
+    <button onclick="fixImages()">Fix Missing Images</button>
+    <button onclick="clearAll()">Clear All Data</button>
+    
+    <script>
+        function fixImages() {
+            let articles = JSON.parse(localStorage.getItem('newsflash_articles'));
+            if (articles) {
+                let fixed = 0;
+                articles = articles.map(article => {
+                    if (article.imageUrl && article.imageUrl.includes('upload_')) {
+                        article.imageUrl = 'img/placeholder.jpg';
+                        fixed++;
+                    }
+                    return article;
+                });
+                localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+                alert(`Fixed ${fixed} articles! Refresh your main site.`);
+            } else {
+                alert('No articles found');
+            }
+        }
+        
+        function clearAll() {
+            localStorage.clear();
+            alert('Local storage cleared! Refresh the page.');
+        }
+    </script>
+</body>
+</html>
