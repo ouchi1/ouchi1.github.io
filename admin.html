@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsFlash - Admin Panel</title>
+    <title>NewsFlash - Admin Panel with Image Upload</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -92,6 +92,110 @@
             min-height: 100px;
         }
         
+        /* Image upload area */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8e8ff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .image-preview-area {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .uploaded-image-preview {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .uploaded-image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .existing-images {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .existing-image-item {
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .existing-image-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .existing-image-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid transparent;
+        }
+        
+        .existing-image-item.selected img {
+            border-color: #28a745;
+        }
+        
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -161,12 +265,6 @@
             padding: 8px 15px;
             margin-left: 10px;
             font-size: 12px;
-        }
-        
-        .image-preview {
-            max-width: 100px;
-            margin-top: 10px;
-            border-radius: 5px;
         }
         
         .success {
@@ -242,6 +340,16 @@
                 gap: 15px;
             }
         }
+        
+        .image-path-input {
+            margin-top: 10px;
+        }
+        
+        .path-hint {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -249,7 +357,7 @@
         <div class="header">
             <div>
                 <h1><i class="fas fa-newspaper"></i> NewsFlash Admin Panel</h1>
-                <p>Manage your news articles - changes appear instantly on main site</p>
+                <p>Manage your news articles - with easy image upload!</p>
             </div>
             <a href="index.html" class="view-site-btn" target="_blank"><i class="fas fa-external-link-alt"></i> View Main Site</a>
         </div>
@@ -289,10 +397,31 @@
                         <input type="date" id="date" required>
                     </div>
                     
+                    <!-- Image Upload Section -->
                     <div class="form-group">
-                        <label for="imageUrl">Image Path</label>
+                        <label><i class="fas fa-image"></i> Upload Image (Easy Way)</label>
+                        <div id="uploadArea" class="upload-area">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-text">Click or drag & drop an image here</div>
+                            <div class="upload-hint">Supports JPG, PNG, GIF (Max 5MB)</div>
+                            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                        </div>
+                        <div id="imagePreviewContainer" class="image-preview-area"></div>
+                    </div>
+                    
+                    <!-- Or select existing image -->
+                    <div class="form-group">
+                        <label><i class="fas fa-folder-open"></i> Or Select Existing Image</label>
+                        <div id="existingImagesContainer" class="existing-images">
+                            <div style="color: #999; text-align: center;">Loading existing images...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Manual path input (fallback) -->
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Or Enter Image Path Manually</label>
                         <input type="text" id="imageUrl" placeholder="img/your-image.jpg">
-                        <small>Use existing: 1.jpg, 2.jpg, 10.jpg, 14.jpg, 15.jpg, 16.jpg or enter new path</small>
+                        <div class="path-hint" id="pathHint"></div>
                     </div>
                     
                     <div class="form-group">
@@ -338,6 +467,8 @@
         import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
         
         let currentEditId = null;
+        let currentUploadedImage = null;
+        let currentImagePath = '';
         
         // Display message
         function showMessage(message, type = 'success') {
@@ -345,7 +476,7 @@
             container.innerHTML = `<div class="${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}</div>`;
             setTimeout(() => {
                 container.innerHTML = '';
-            }, 3000);
+            }, 4000);
         }
         
         // Generate new ID
@@ -353,6 +484,304 @@
             if (!articles || articles.length === 0) return 1;
             return Math.max(...articles.map(a => a.id)) + 1;
         }
+        
+        // Load existing images from img folder
+        async function loadExistingImages() {
+            const container = document.getElementById('existingImagesContainer');
+            
+            // List of known images from your img folder
+            const knownImages = ['1.jpg', '2.jpg', '10.jpg', '14.jpg', '15.jpg', '16.jpg', 'ID_9.png', 'logo.png'];
+            
+            // Try to detect more images
+            const detectedImages = [];
+            for (let i = 1; i <= 30; i++) {
+                const testUrl = `img/${i}.jpg`;
+                try {
+                    const response = await fetch(testUrl, { method: 'HEAD' });
+                    if (response.ok) {
+                        detectedImages.push(`${i}.jpg`);
+                    }
+                } catch(e) {}
+            }
+            
+            const allImages = [...new Set([...knownImages, ...detectedImages])];
+            
+            if (allImages.length === 0) {
+                container.innerHTML = '<div style="color: #999; text-align: center;">No existing images found. Upload one first!</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="margin-bottom: 10px; color: #666; font-size: 12px;">Click to select an existing image:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    ${allImages.map(img => `
+                        <div class="existing-image-item" data-path="img/${img}">
+                            <img src="img/${img}" alt="${img}" onerror="this.parentElement.style.display='none'">
+                            <div style="font-size: 10px; text-align: center;">${img}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Add click handlers
+            document.querySelectorAll('.existing-image-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const path = el.dataset.path;
+                    selectExistingImage(path);
+                    document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                });
+            });
+        }
+        
+        // Select existing image
+        function selectExistingImage(path) {
+            currentImagePath = path;
+            document.getElementById('imageUrl').value = path;
+            document.getElementById('pathHint').innerHTML = `<i class="fas fa-check-circle"></i> Selected: ${path}`;
+            
+            // Clear uploaded preview if any
+            currentUploadedImage = null;
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            
+            // Update preview
+            updatePreviewWithImage(path);
+            showMessage(`Selected image: ${path}`, 'info');
+        }
+        
+        // Handle image upload
+        function setupImageUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const imageFile = document.getElementById('imageFile');
+            
+            uploadArea.addEventListener('click', () => {
+                imageFile.click();
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageFile(files[0]);
+                }
+            });
+            
+            imageFile.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImageFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        // Handle uploaded image file
+        function handleImageFile(file) {
+            if (!file.type.match('image.*')) {
+                showMessage('Please upload an image file (JPG, PNG, GIF)', 'error');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('Image too large! Max 5MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                currentUploadedImage = {
+                    data: imageData,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                };
+                
+                // Generate a clean filename
+                const timestamp = Date.now();
+                const ext = file.name.split('.').pop();
+                const filename = `upload_${timestamp}.${ext}`;
+                currentImagePath = `img/${filename}`;
+                
+                // Show preview
+                const container = document.getElementById('imagePreviewContainer');
+                container.innerHTML = `
+                    <div class="uploaded-image-preview">
+                        <img src="${imageData}" alt="Uploaded">
+                        <div class="remove-image" onclick="clearUploadedImage()">×</div>
+                    </div>
+                    <div style="font-size: 12px; color: #666;">
+                        <i class="fas fa-check-circle" style="color: #28a745;"></i> Ready to save: ${filename}
+                    </div>
+                `;
+                
+                // Set the path in form
+                document.getElementById('imageUrl').value = currentImagePath;
+                document.getElementById('pathHint').innerHTML = `<i class="fas fa-upload"></i> New image ready: ${filename}`;
+                
+                // Update preview
+                updatePreviewWithImage(imageData);
+                
+                showMessage(`Image "${file.name}" loaded! Will be saved as ${filename}`, 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Clear uploaded image
+        window.clearUploadedImage = function() {
+            currentUploadedImage = null;
+            currentImagePath = '';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('pathHint').innerHTML = '';
+            showMessage('Image cleared', 'info');
+        };
+        
+        // Update preview with image
+        function updatePreviewWithImage(imageSrc) {
+            const preview = document.getElementById('livePreview');
+            const title = document.getElementById('title').value || 'Article Title';
+            const description = document.getElementById('description').value || 'Article description will appear here...';
+            const category = document.getElementById('category').value || 'Category';
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            
+            preview.innerHTML = `
+                <div class="preview-card">
+                    <img src="${imageSrc}" alt="Preview" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
+                    <div class="preview-content">
+                        <span class="preview-category">${category}</span>
+                        <h3 style="margin: 10px 0;">${title.substring(0, 60)}</h3>
+                        <p style="color: #666; line-height: 1.5;">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</p>
+                        <small style="color: #999;"><i class="far fa-calendar"></i> ${date}</small>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Update live preview from form
+        function updatePreview() {
+            let imageUrl = document.getElementById('imageUrl').value;
+            if (!imageUrl && currentUploadedImage) {
+                imageUrl = currentUploadedImage.data;
+            } else if (!imageUrl) {
+                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+            }
+            updatePreviewWithImage(imageUrl);
+        }
+        
+        // Save uploaded image to server (download for local save)
+        function saveUploadedImage() {
+            if (!currentUploadedImage) return null;
+            
+            // Create download link for the image
+            const link = document.createElement('a');
+            const filename = currentImagePath.replace('img/', '');
+            link.download = filename;
+            link.href = currentUploadedImage.data;
+            link.click();
+            
+            return currentImagePath;
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('articleForm').reset();
+            currentEditId = null;
+            currentUploadedImage = null;
+            currentImagePath = '';
+            document.getElementById('formTitle').textContent = 'Add New Article';
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('pathHint').innerHTML = '';
+            document.getElementById('imageUrl').value = '';
+            updatePreview();
+            
+            // Remove selection highlight from existing images
+            document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
+        }
+        
+        // Handle form submission
+        document.getElementById('articleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value;
+            let imageUrl = document.getElementById('imageUrl').value.trim();
+            const alt = document.getElementById('alt').value.trim() || title;
+            const fullContent = document.getElementById('fullContent').value.trim() || description;
+            
+            if (!title || !description || !category || !date) {
+                showMessage('Please fill in all required fields (*)', 'error');
+                return;
+            }
+            
+            // Handle uploaded image
+            let imageSaveMessage = '';
+            if (currentUploadedImage) {
+                const savedPath = saveUploadedImage();
+                if (savedPath) {
+                    imageUrl = savedPath;
+                    imageSaveMessage = ` Image saved as "${savedPath}". Move it to your img/ folder.`;
+                }
+            }
+            
+            if (!imageUrl) {
+                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+            }
+            
+            if (currentEditId) {
+                // Update existing article
+                const index = articles.findIndex(a => a.id === currentEditId);
+                if (index !== -1) {
+                    articles[index] = {
+                        ...articles[index],
+                        title,
+                        description,
+                        category,
+                        date,
+                        imageUrl,
+                        alt,
+                        fullContent
+                    };
+                    showMessage(`✅ Article "${title}" updated successfully!${imageSaveMessage}`, 'success');
+                }
+                currentEditId = null;
+                document.getElementById('formTitle').textContent = 'Add New Article';
+            } else {
+                // Add new article
+                const newArticle = {
+                    id: generateNewId(),
+                    title,
+                    description,
+                    category,
+                    date,
+                    imageUrl,
+                    alt,
+                    fullContent
+                };
+                articles.push(newArticle);
+                showMessage(`✅ Article "${title}" added successfully! (ID: ${newArticle.id})${imageSaveMessage}`, 'success');
+            }
+            
+            // Save to localStorage
+            saveArticles();
+            loadArticlesList();
+            resetForm();
+            
+            if (imageSaveMessage) {
+                showMessage(`📸 ${imageSaveMessage} Don't forget to add the image file to your GitHub img/ folder!`, 'info');
+            }
+        });
         
         // Load and display articles
         function loadArticlesList() {
@@ -386,102 +815,7 @@
             `).join('');
         }
         
-        // Update live preview
-        function updatePreview() {
-            const title = document.getElementById('title').value || 'Article Title';
-            const description = document.getElementById('description').value || 'Article description will appear here...';
-            const category = document.getElementById('category').value || 'Category';
-            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
-            let imageUrl = document.getElementById('imageUrl').value || 'https://via.placeholder.com/400x200?text=No+Image';
-            
-            const preview = document.getElementById('livePreview');
-            preview.innerHTML = `
-                <div class="preview-card">
-                    <img src="${imageUrl}" alt="Preview" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
-                    <div class="preview-content">
-                        <span class="preview-category">${category}</span>
-                        <h3 style="margin: 10px 0;">${title}</h3>
-                        <p style="color: #666; line-height: 1.5;">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</p>
-                        <small style="color: #999;"><i class="far fa-calendar"></i> ${date}</small>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Reset form
-        function resetForm() {
-            document.getElementById('articleForm').reset();
-            currentEditId = null;
-            document.getElementById('formTitle').textContent = 'Add New Article';
-            document.getElementById('date').value = new Date().toISOString().split('T')[0];
-            updatePreview();
-        }
-        
-        // Handle form submission
-        document.getElementById('articleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const title = document.getElementById('title').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const category = document.getElementById('category').value;
-            const date = document.getElementById('date').value;
-            let imageUrl = document.getElementById('imageUrl').value.trim();
-            const alt = document.getElementById('alt').value.trim() || title;
-            const fullContent = document.getElementById('fullContent').value.trim() || description;
-            
-            if (!title || !description || !category || !date) {
-                showMessage('Please fill in all required fields (*)', 'error');
-                return;
-            }
-            
-            if (!imageUrl) {
-                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
-            }
-            
-            if (currentEditId) {
-                // Update existing article
-                const index = articles.findIndex(a => a.id === currentEditId);
-                if (index !== -1) {
-                    articles[index] = {
-                        ...articles[index],
-                        title,
-                        description,
-                        category,
-                        date,
-                        imageUrl,
-                        alt,
-                        fullContent
-                    };
-                    showMessage(`✅ Article "${title}" updated successfully!`, 'success');
-                }
-                currentEditId = null;
-                document.getElementById('formTitle').textContent = 'Add New Article';
-            } else {
-                // Add new article
-                const newArticle = {
-                    id: generateNewId(),
-                    title,
-                    description,
-                    category,
-                    date,
-                    imageUrl,
-                    alt,
-                    fullContent
-                };
-                articles.push(newArticle);
-                showMessage(`✅ Article "${title}" added successfully! (ID: ${newArticle.id})`, 'success');
-            }
-            
-            // Save to localStorage and sync
-            saveArticles();
-            loadArticlesList();
-            resetForm();
-            
-            // Show sync info
-            showMessage('🔄 Changes saved! Refresh your main site to see updates.', 'info');
-        });
-        
-        // Edit article (global function)
+        // Edit article
         window.editArticleById = function(id) {
             const article = articles.find(a => a.id === id);
             if (article) {
@@ -494,13 +828,13 @@
                 document.getElementById('fullContent').value = article.fullContent || '';
                 currentEditId = article.id;
                 document.getElementById('formTitle').textContent = `Edit Article #${article.id}`;
-                updatePreview();
+                updatePreviewWithImage(article.imageUrl);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 showMessage(`✏️ Editing: ${article.title}`, 'info');
             }
         };
         
-        // Delete article (global function)
+        // Delete article
         window.deleteArticleById = function(id) {
             const article = articles.find(a => a.id === id);
             if (article && confirm(`Delete "${article.title}"?\n\nThis action cannot be undone.`)) {
@@ -527,10 +861,17 @@
         
         // Initialize
         loadArticlesFromStorage();
+        setupImageUpload();
+        loadExistingImages();
         resetForm();
         loadArticlesList();
         
-        console.log('✅ Admin panel ready! Current articles:', articles.length);
+        console.log('✅ Admin panel ready with image upload! Current articles:', articles.length);
+        
+        // Make functions global
+        window.clearUploadedImage = clearUploadedImage;
+        window.editArticleById = editArticleById;
+        window.deleteArticleById = deleteArticleById;
     </script>
 </body>
 </html>
