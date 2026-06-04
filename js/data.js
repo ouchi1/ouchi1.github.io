@@ -165,8 +165,6 @@ export let articles = [
     alt: "Government and politics concept image"
   }
 ];
-
-// Save articles to localStorage
 export function saveArticles() {
     localStorage.setItem('newsflash_articles', JSON.stringify(articles));
     console.log('✅ Articles saved to localStorage:', articles.length, 'articles');
