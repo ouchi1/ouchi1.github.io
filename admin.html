@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - NewsFlash</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .form-section, .preview-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .article-list {
+            margin-top: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        .article-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .article-info h3 {
+            margin-bottom: 5px;
+        }
+        
+        .article-actions button {
+            padding: 5px 10px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+        }
+        
+        .edit-btn {
+            background: #28a745;
+        }
+        
+        .image-preview {
+            max-width: 100px;
+            margin-top: 10px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-newspaper"></i> NewsFlash Admin Panel</h1>
+            <p>Manage your news articles easily</p>
+        </div>
+        
+        <div class="admin-panel">
+            <div class="form-section">
+                <h2><i class="fas fa-plus-circle"></i> Add New Article</h2>
+                <div id="message"></div>
+                
+                <form id="articleForm">
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description/Excerpt *</label>
+                        <textarea id="description" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="News">News</option>
+                            <option value="Politics">Politics</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Business">Business</option>
+                            <option value="Opinion">Opinion</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Entertainment">Entertainment</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageUrl">Image Filename (e.g., 1.jpg, 2.jpg, or upload new)</label>
+                        <input type="text" id="imageUrl" placeholder="img/1.jpg">
+                        <small>Enter path like: img/your-image.jpg</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageUpload">Or Upload New Image</label>
+                        <input type="file" id="imageUpload" accept="image/jpeg,image/png,image/jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="alt">Image Alt Text</label>
+                        <input type="text" id="alt" placeholder="Image description for accessibility">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullContent">Full Article Content (HTML supported)</label>
+                        <textarea id="fullContent" rows="10" placeholder="Write your full article here. Use \n\n for paragraphs."></textarea>
+                    </div>
+                    
+                    <button type="submit"><i class="fas fa-save"></i> Save Article</button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()"><i class="fas fa-undo"></i> Reset</button>
+                </form>
+            </div>
+            
+            <div class="preview-section">
+                <h2><i class="fas fa-eye"></i> Live Preview</h2>
+                <div id="livePreview" style="border: 1px solid #eee; padding: 20px; border-radius: 5px; background: #fafafa;">
+                    <p style="color: #999;">Fill the form to see preview...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="article-list">
+            <h2><i class="fas fa-list"></i> All Articles</h2>
+            <div id="articlesList"></div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { articles, saveArticles } from './js/data.js';
+        
+        let currentEditId = null;
+        
+        // Load and display articles
+        function loadArticles() {
+            const articlesList = document.getElementById('articlesList');
+            if (!articles || articles.length === 0) {
+                articlesList.innerHTML = '<p>No articles yet. Create your first article!</p>';
+                return;
+            }
+            
+            articlesList.innerHTML = articles.map(article => `
+                <div class="article-item">
+                    <div class="article-info">
+                        <h3>#${article.id} - ${article.title}</h3>
+                        <p>${article.description.substring(0, 100)}...</p>
+                        <small>Category: ${article.category} | Date: ${article.date}</small>
+                    </div>
+                    <div class="article-actions">
+                        <button class="edit-btn" onclick="editArticle(${article.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteArticle(${article.id})"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Generate new ID
+        function generateNewId() {
+            if (!articles || articles.length === 0) return 1;
+            return Math.max(...articles.map(a => a.id)) + 1;
+        }
+        
+        // Handle form submission
+        document.getElementById('articleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value;
+            let imageUrl = document.getElementById('imageUrl').value;
+            const alt = document.getElementById('alt').value || title;
+            const fullContent = document.getElementById('fullContent').value;
+            
+            // Handle image upload
+            const imageFile = document.getElementById('imageUpload').files[0];
+            if (imageFile) {
+                // For local preview, create object URL
+                imageUrl = URL.createObjectURL(imageFile);
+                // Note: For actual upload, you'd need a backend server
+                showMessage('Note: Image upload requires backend server. Save image to img/ folder manually.', 'error');
+            }
+            
+            if (!imageUrl) {
+                imageUrl = 'img/placeholder.jpg';
+            }
+            
+            const newArticle = {
+                id: currentEditId || generateNewId(),
+                title,
+                description,
+                category,
+                date,
+                imageUrl,
+                alt,
+                fullContent: fullContent || description
+            };
+            
+            if (currentEditId) {
+                // Update existing article
+                const index = articles.findIndex(a => a.id === currentEditId);
+                if (index !== -1) {
+                    articles[index] = newArticle;
+                    showMessage('Article updated successfully!', 'success');
+                }
+                currentEditId = null;
+            } else {
+                // Add new article
+                articles.push(newArticle);
+                showMessage('Article added successfully!', 'success');
+            }
+            
+            // Save to localStorage and export
+            saveArticles();
+            loadArticles();
+            resetForm();
+            updatePreview();
+            
+            // Show download link for updated data.js
+            showDownloadLink();
+        });
+        
+        // Live preview
+        function updatePreview() {
+            const preview = document.getElementById('livePreview');
+            const title = document.getElementById('title').value || 'Sample Title';
+            const description = document.getElementById('description').value || 'Sample description...';
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            const imageUrl = document.getElementById('imageUrl').value || 'img/placeholder.jpg';
+            
+            preview.innerHTML = `
+                <div style="border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+                    <img src="${imageUrl}" alt="Preview" style="width: 100%; height: 150px; object-fit: cover; background: #eee;">
+                    <div style="padding: 15px;">
+                        <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">${category}</span>
+                        <h3 style="margin: 10px 0;">${title}</h3>
+                        <p style="color: #666; font-size: 14px;">${description.substring(0, 100)}...</p>
+                        <small style="color: #999;">${date}</small>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Listen to form inputs for live preview
+        ['title', 'description', 'category', 'date', 'imageUrl'].forEach(field => {
+            document.getElementById(field).addEventListener('input', updatePreview);
+        });
+        
+        // Reset form
+        window.resetForm = function() {
+            document.getElementById('articleForm').reset();
+            currentEditId = null;
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            updatePreview();
+        };
+        
+        // Edit article
+        window.editArticle = function(id) {
+            const article = articles.find(a => a.id === id);
+            if (article) {
+                document.getElementById('title').value = article.title;
+                document.getElementById('description').value = article.description;
+                document.getElementById('category').value = article.category;
+                document.getElementById('date').value = article.date;
+                document.getElementById('imageUrl').value = article.imageUrl;
+                document.getElementById('alt').value = article.alt || '';
+                document.getElementById('fullContent').value = article.fullContent || '';
+                currentEditId = article.id;
+                updatePreview();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+        
+        // Delete article
+        window.deleteArticle = function(id) {
+            if (confirm('Are you sure you want to delete this article?')) {
+                const index = articles.findIndex(a => a.id === id);
+                if (index !== -1) {
+                    articles.splice(index, 1);
+                    saveArticles();
+                    loadArticles();
+                    showMessage('Article deleted successfully!', 'success');
+                }
+            }
+        };
+        
+        // Show message
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${msg}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+        
+        // Show download link
+        function showDownloadLink() {
+            const articlesData = `export const articles = ${JSON.stringify(articles, null, 2)};\n\nexport function saveArticles() {\n    localStorage.setItem('newsflash_articles', JSON.stringify(articles));\n}\n`;
+            const blob = new Blob([articlesData], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data_export.js';
+            a.textContent = 'Download updated data.js';
+            a.style.display = 'block';
+            a.style.marginTop = '10px';
+            document.getElementById('message').appendChild(a);
+        }
+        
+        // Initialize
+        resetForm();
+        loadArticles();
+        
+        // Set default date
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    </script>
+    
+    <script>
+        // These functions need to be global for onclick handlers
+        window.editArticle = window.editArticle;
+        window.deleteArticle = window.deleteArticle;
+        window.resetForm = window.resetForm;
+    </script>
+</body>
+</html>
