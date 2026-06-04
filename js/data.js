@@ -169,7 +169,19 @@ export const articles = [
   }
 
 ];
-
+// Add this function to save articles
+export function saveArticles() {
+    localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+    // Also create downloadable file
+    const dataStr = `export const articles = ${JSON.stringify(articles, null, 2)};\n\nexport function saveArticles() {\n    localStorage.setItem('newsflash_articles', JSON.stringify(articles));\n}\n`;
+    const blob = new Blob([dataStr], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data_updated.js';
+    a.click();
+    URL.revokeObjectURL(url);
+}
 // ==================== TEMPLATE FOR NEW ARTICLE ====================
 // Copy this template and paste at the end of the array (before the closing ])
 // Make sure to add a comma after the previous article!
@@ -186,3 +198,9 @@ export const articles = [
   alt: "Image description"
 }
 */
+ 
+ e x p o r t   f u n c t i o n   s a v e A r t i c l e s ( )   {  
+         l o c a l S t o r a g e . s e t I t e m ( ' n e w s f l a s h _ a r t i c l e s ' ,   J S O N . s t r i n g i f y ( a r t i c l e s ) ) ;  
+         c o n s o l e . l o g ( ' A r t i c l e s   s a v e d   t o   l o c a l S t o r a g e ' ) ;  
+ }  
+ 
