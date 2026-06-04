@@ -155,7 +155,7 @@ export const articles = [
   description: "A 60-year-old man shares his personal reflections about President Trump’s work ethic and dedication, expressing admiration for his continued public service and calling for prayers and blessings for his health and strength.",
   category: "Opinion",
   date: "2026-06-04",
-  imageUrl: "IMG/16.jpg",
+  imageUrl: "img/16.jpg",
   alt: "American flag and political background representing leadership and national politics"
 },
   {
@@ -182,7 +182,7 @@ export const articles = [
   fullContent: "Full article content here. Use \n\n to create paragraphs.\n\nThis is the second paragraph. You can write as much as you want.\n\nThis is the third paragraph with more details.",
   category: "News",
   date: "2026-06-03",
-  imageUrl: "IMG/your-image.jpg",
+  imageUrl: "img/your-image.jpg",
   alt: "Image description"
 }
 */
