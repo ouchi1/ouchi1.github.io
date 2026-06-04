@@ -1,9 +1,6 @@
-// ==================== NEWS DATA ====================
-// 📰 TO ADD A NEW ARTICLE: Copy the template below and paste at the END of the array
-// Make sure to add a comma after the previous article!
-
-export const articles = [
-  {
+// Main articles data store
+export let articles = [
+    {
     id: 1,
     title: "Trump Signs AI Executive Order",
     description: "New framework allows government to vet advanced AI systems for national security risks up to 30 days before public release.",
@@ -167,11 +164,13 @@ export const articles = [
     imageUrl: "img/17.jpg",
     alt: "Government and politics concept image"
   }
-
 ];
-// Add this function to save articles
+
+// Save articles to localStorage
 export function saveArticles() {
     localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+    console.log('✅ Articles saved to localStorage:', articles.length, 'articles');
+    
     // Also create downloadable file
     const dataStr = `export const articles = ${JSON.stringify(articles, null, 2)};\n\nexport function saveArticles() {\n    localStorage.setItem('newsflash_articles', JSON.stringify(articles));\n}\n`;
     const blob = new Blob([dataStr], { type: 'text/javascript' });
@@ -181,26 +180,29 @@ export function saveArticles() {
     a.download = 'data_updated.js';
     a.click();
     URL.revokeObjectURL(url);
+    
+    return true;
 }
-// ==================== TEMPLATE FOR NEW ARTICLE ====================
-// Copy this template and paste at the end of the array (before the closing ])
-// Make sure to add a comma after the previous article!
-/*
-,
-{
-  id: 9,
-  title: "Your Breaking News Title Here",
-  description: "Short preview of the news (max 120 characters)",
-  fullContent: "Full article content here. Use \n\n to create paragraphs.\n\nThis is the second paragraph. You can write as much as you want.\n\nThis is the third paragraph with more details.",
-  category: "News",
-  date: "2026-06-03",
-  imageUrl: "img/your-image.jpg",
-  alt: "Image description"
+
+// Load articles from localStorage (for main site)
+export function loadArticlesFromStorage() {
+    const saved = localStorage.getItem('newsflash_articles');
+    if (saved && saved !== 'undefined') {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.length > 0) {
+                console.log('📦 Loaded from localStorage:', parsed.length, 'articles');
+                articles.length = 0;
+                articles.push(...parsed);
+                return true;
+            }
+        } catch(e) {
+            console.error('Error loading from localStorage:', e);
+        }
+    }
+    console.log('📁 Using default articles from data.js');
+    return false;
 }
-*/
- 
- e x p o r t   f u n c t i o n   s a v e A r t i c l e s ( )   {  
-         l o c a l S t o r a g e . s e t I t e m ( ' n e w s f l a s h _ a r t i c l e s ' ,   J S O N . s t r i n g i f y ( a r t i c l e s ) ) ;  
-         c o n s o l e . l o g ( ' A r t i c l e s   s a v e d   t o   l o c a l S t o r a g e ' ) ;  
- }  
- 
+
+// Auto-load on import
+loadArticlesFromStorage();
