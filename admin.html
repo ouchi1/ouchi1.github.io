@@ -443,7 +443,7 @@
                 <h2><i class="fas fa-eye"></i> Live Preview</h2>
                 <div id="livePreview">
                     <div class="preview-card">
-                        <img src="https://via.placeholder.com/400x200?text=Preview" alt="Preview">
+                        <img src="img/placeholder.jpg" alt="Preview">
                         <div class="preview-content">
                             <span class="preview-category">Category</span>
                             <h3 style="margin: 10px 0;">Article Title</h3>
@@ -672,7 +672,7 @@
             if (!imageUrl && currentUploadedImage) {
                 imageUrl = currentUploadedImage.data;
             } else if (!imageUrl) {
-                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+                imageUrl = 'img/placeholder.jpg';
             }
             updatePreviewWithImage(imageUrl);
         }
@@ -736,7 +736,7 @@
             }
             
             if (!imageUrl) {
-                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+                imageUrl = 'img/placeholder.jpg';
             }
             
             if (currentEditId) {
