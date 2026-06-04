@@ -204,3 +204,14 @@ export function loadArticlesFromStorage() {
 
 // Auto-load on import
 loadArticlesFromStorage();
+// Make functions available globally for admin panel
+if (typeof window !== 'undefined') {
+  window.articles = articles;
+  window.saveArticles = saveArticles;
+  window.loadArticlesFromStorage = loadArticlesFromStorage;
+}
+// Make available globally for admin panel
+if (typeof window !== 'undefined') {
+  window.articles = articles;
+  window.saveArticles = saveArticles;
+}
