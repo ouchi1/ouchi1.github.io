@@ -215,3 +215,18 @@ if (typeof window !== 'undefined') {
   window.articles = articles;
   window.saveArticles = saveArticles;
 }
+export const articles = [];
+
+export function saveArticles() {
+    localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+}
+
+export function loadArticlesFromStorage() {
+    const stored = localStorage.getItem('newsflash_articles');
+    if (stored) {
+        const loaded = JSON.parse(stored);
+        articles.length = 0;
+        articles.push(...loaded);
+    }
+    return articles;
+}

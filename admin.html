@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsFlash - Auto Git Push Admin</title>
+    <title>NewsFlash Admin - Auto Git Push</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
+            background: #f0f2f5;
             padding: 20px;
         }
         
@@ -26,9 +26,9 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
-            border-radius: 10px;
- margin-bottom: 30px;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -36,68 +36,75 @@
             gap: 15px;
         }
         
-        .github-config {
-            background: #24292e;
-            color: white;
+        .github-status {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .config-bar {
+            background: white;
             padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .config-input {
-            background: white;
-            color: #333;
-            padding: 8px 12px;
-            border-radius: 5px;
-            margin: 5px;
-            width: 300px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .btn {
+            padding: 10px 20px;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-left: 10px;
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
         
-        .status-success {
+        .btn-success {
             background: #28a745;
             color: white;
         }
         
-        .status-error {
-            background: #dc3545;
+        .btn-secondary {
+            background: #6c757d;
             color: white;
         }
         
-        .status-pushing {
-            background: #ffc107;
-            color: #333;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
         }
         
         .admin-panel {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            gap: 25px;
         }
         
-        .form-section, .preview-section {
+        .card {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
-        h2 {
+        .card h2 {
             margin-bottom: 20px;
             color: #333;
             border-bottom: 2px solid #667eea;
@@ -105,12 +112,12 @@
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: #555;
         }
@@ -118,21 +125,16 @@
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
         }
         
         .upload-area {
             border: 2px dashed #ddd;
             border-radius: 10px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
@@ -144,7 +146,7 @@
             background: #f0f0ff;
         }
         
-        .image-preview-area {
+        .image-preview {
             margin-top: 15px;
             display: flex;
             gap: 15px;
@@ -152,76 +154,42 @@
             flex-wrap: wrap;
         }
         
-        .uploaded-image-preview {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .uploaded-image-preview img {
-            width: 100px;
-            height: 100px;
+        .image-preview img {
+            width: 80px;
+            height: 80px;
             object-fit: cover;
             border-radius: 8px;
-            border: 2px solid #667eea;
         }
         
-        .remove-image {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 10px;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
+        .log-console {
+            background: #1e1e2f;
+            color: #0f0;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 11px;
         }
         
         .article-list {
-            margin-top: 30px;
+            margin-top: 25px;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
+            border-radius: 12px;
+            padding: 25px;
         }
         
         .article-item {
             border: 1px solid #eee;
             padding: 15px;
             margin-bottom: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .article-info {
@@ -233,90 +201,30 @@
             color: #333;
         }
         
-        .article-actions button {
-            padding: 8px 15px;
-            margin-left: 10px;
-            font-size: 12px;
-        }
-        
-        .success {
+        .alert-success {
             background: #d4edda;
             color: #155724;
             padding: 12px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #28a745;
         }
         
-        .error {
+        .alert-error {
             background: #f8d7da;
             color: #721c24;
             padding: 12px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #dc3545;
-        }
-        
-        .info {
-            background: #d1ecf1;
-            color: #0c5460;
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            border-left: 4px solid #17a2b8;
-        }
-        
-        .preview-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            background: white;
-        }
-        
-        .preview-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        
-        .preview-card .preview-content {
-            padding: 20px;
-        }
-        
-        .preview-category {
-            background: #667eea;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-        
-        .stats {
-            display: inline-block;
-            background: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-left: 15px;
-            font-size: 14px;
-        }
-        
-        .log-console {
-            background: #1e1e2f;
-            color: #0f0;
-            font-family: monospace;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 12px;
         }
         
         @media (max-width: 768px) {
             .admin-panel {
                 grid-template-columns: 1fr;
+            }
+            .article-item {
+                flex-direction: column;
             }
         }
     </style>
@@ -325,284 +233,369 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1><i class="fab fa-github"></i> NewsFlash Admin + Auto Git Push</h1>
-                <p>Save articles - Auto push to GitHub via API</p>
+                <h1><i class="fab fa-github"></i> NewsFlash Admin</h1>
+                <p>Auto-push to GitHub | Live sync with main site</p>
             </div>
-            <a href="index.html" class="view-site-btn" target="_blank" style="background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
-                <i class="fas fa-external-link-alt"></i> View Main Site
-            </a>
+            <div>
+                <span class="github-status" id="gitStatus">
+                    <i class="fas fa-circle" style="color: #28a745;"></i> Ready
+                </span>
+                <a href="index.html" target="_blank" class="btn" style="background: rgba(255,255,255,0.2); margin-left: 10px;">
+                    <i class="fas fa-external-link-alt"></i> View Site
+                </a>
+            </div>
         </div>
         
-        <!-- GitHub Configuration -->
-        <div class="github-config">
-            <h3 style="margin-bottom: 15px;"><i class="fab fa-github"></i> GitHub Auto-Push Setup</h3>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                <input type="text" id="githubToken" class="config-input" placeholder="GitHub Personal Access Token" style="flex: 1;">
-                <input type="text" id="githubRepo" class="config-input" placeholder="username/repo (e.g., john/newsflash)" style="flex: 1;">
-                <button id="saveConfigBtn" style="background: #28a745; padding: 8px 20px;">Save Config</button>
+        <!-- GitHub Config -->
+        <div class="config-bar">
+            <div style="display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 15px; align-items: end;">
+                <div>
+                    <label style="font-size: 12px;">GitHub Token</label>
+                    <input type="password" id="githubToken" class="config-input" placeholder="ghp_xxxxxxxxxxxx">
+                </div>
+                <div>
+                    <label style="font-size: 12px;">Repository (username/repo)</label>
+                    <input type="text" id="githubRepo" class="config-input" placeholder="yourusername/newsflash">
+                </div>
+                <div>
+                    <label style="font-size: 12px;">Branch</label>
+                    <input type="text" id="githubBranch" class="config-input" value="main">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="testBtn" class="btn btn-success"><i class="fas fa-plug"></i> Test</button>
+                    <button id="saveConfigBtn" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                </div>
             </div>
-            <div style="margin-top: 10px; font-size: 12px; color: #ccc;">
+            <div style="margin-top: 12px; font-size: 12px; color: #666;">
                 <i class="fas fa-info-circle"></i> Need a token? 
-                <a href="https://github.com/settings/tokens" target="_blank" style="color: #ffd700;">Create one here</a> 
-                (Requires 'repo' scope)
+                <a href="https://github.com/settings/tokens/new?scopes=repo,workflow" target="_blank">Create one here</a> 
+                (select <strong>repo</strong> and <strong>workflow</strong> scopes)
             </div>
         </div>
         
-        <div id="messageContainer"></div>
+        <div id="messageArea"></div>
         
         <div class="admin-panel">
-            <div class="form-section">
-                <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Add New Article</span></h2>
-                
+            <div class="card">
+                <h2><i class="fas fa-edit"></i> Add / Edit Article</h2>
                 <form id="articleForm">
                     <div class="form-group">
-                        <label for="title">Title *</label>
+                        <label>Title *</label>
                         <input type="text" id="title" required placeholder="Enter article title">
                     </div>
                     
                     <div class="form-group">
-                        <label for="description">Description *</label>
-                        <textarea id="description" required placeholder="Brief summary"></textarea>
+                        <label>Description *</label>
+                        <textarea id="description" required rows="3" placeholder="Short description for the news grid"></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="category">Category *</label>
-                        <select id="category" required>
-                            <option value="News">📰 News</option>
-                            <option value="Technology">💻 Technology</option>
-                            <option value="Business">📈 Business</option>
-                            <option value="Sports">⚽ Sports</option>
+                        <label>Category</label>
+                        <select id="category">
+                            <option>News</option>
+                            <option>Politics</option>
+                            <option>Technology</option>
+                            <option>Business</option>
+                            <option>Sports</option>
+                            <option>Entertainment</option>
+                            <option>Opinion</option>
+                            <option>World</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="date">Date *</label>
-                        <input type="date" id="date" required>
+                        <label>Date</label>
+                        <input type="date" id="date">
                     </div>
                     
                     <div class="form-group">
-                        <label><i class="fas fa-image"></i> Upload Image</label>
+                        <label>Upload Image</label>
                         <div id="uploadArea" class="upload-area">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <div class="upload-text">Click or drag & drop an image here</div>
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #667eea;"></i>
+                            <p>Click or drag image here</p>
                             <input type="file" id="imageFile" accept="image/*" style="display: none;">
                         </div>
-                        <div id="imagePreviewContainer" class="image-preview-area"></div>
+                        <div id="imagePreview" class="image-preview"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Image Path</label>
-                        <input type="text" id="imageUrl" placeholder="img/your-image.jpg">
+                        <label>Image URL</label>
+                        <input type="text" id="imageUrl" placeholder="img/filename.jpg or https://...">
                     </div>
                     
                     <div class="form-group">
-                        <label for="fullContent">Full Content</label>
-                        <textarea id="fullContent" rows="8" placeholder="Full article content"></textarea>
+                        <label>Full Content</label>
+                        <textarea id="fullContent" rows="6" placeholder="Full article text..."></textarea>
                     </div>
                     
-                    <button type="submit" id="saveBtn"><i class="fab fa-github"></i> Save & Push to GitHub</button>
-                    <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" id="saveBtn" class="btn btn-primary"><i class="fab fa-github"></i> Save & Push to GitHub</button>
+                        <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+                        <button type="button" id="syncFromStorageBtn" class="btn btn-success"><i class="fas fa-sync"></i> Sync from Storage</button>
+                    </div>
                 </form>
             </div>
             
-            <div class="preview-section">
-                <h2><i class="fas fa-eye"></i> Live Preview</h2>
-                <div id="livePreview">
-                    <div class="preview-card">
-                        <img src="https://via.placeholder.com/400x200" alt="Preview">
-                        <div class="preview-content">
-                            <span class="preview-category">Category</span>
-                            <h3>Article Title</h3>
-                            <p>Description...</p>
-                        </div>
-                    </div>
+            <div class="card">
+                <h2><i class="fas fa-terminal"></i> Live Log</h2>
+                <div class="log-console" id="logConsole">
+                    <div>> Ready to auto-push to GitHub</div>
+                    <div>> Configure your token and repo above</div>
+                    <div>> Current articles: <span id="currentArticleCount">0</span></div>
                 </div>
                 
-                <!-- Git Push Log -->
-                <div class="log-console" id="gitLog">
-                    <div>> Ready to auto-push to GitHub</div>
-                    <div>> Configure your GitHub token and repo above</div>
+                <h2 style="margin-top: 20px;"><i class="fas fa-eye"></i> Live Preview</h2>
+                <div id="livePreview" style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                    <img src="https://via.placeholder.com/400x200" style="width: 100%; height: 150px; object-fit: cover;">
+                    <div style="padding: 15px;">
+                        <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Category</span>
+                        <h3 style="margin: 10px 0;">Article Title</h3>
+                        <p style="color: #666;">Preview will appear here...</p>
+                    </div>
                 </div>
             </div>
         </div>
         
         <div class="article-list">
-            <h2><i class="fas fa-list"></i> All Articles <span class="stats" id="articleCount"></span></h2>
+            <h2><i class="fas fa-list"></i> All Articles <span id="articleCount" style="font-size: 14px; color: #666;"></span></h2>
             <div id="articlesList"></div>
         </div>
     </div>
     
-    <script type="module">
-        import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
-        
+    <script>
+        // Global articles array - matches your data.js structure
+        let articles = [];
         let currentEditId = null;
         let currentImageData = null;
         let currentImageName = null;
-        let gitConfig = {
-            token: localStorage.getItem('github_token') || '',
-            repo: localStorage.getItem('github_repo') || ''
-        };
         
-        // Load saved config
-        if (gitConfig.token) document.getElementById('githubToken').value = gitConfig.token;
-        if (gitConfig.repo) document.getElementById('githubRepo').value = gitConfig.repo;
-        
-        function addToLog(message, isError = false) {
-            const log = document.getElementById('gitLog');
-            const div = document.createElement('div');
-            div.style.color = isError ? '#ff6b6b' : '#0f0';
-            div.style.marginTop = '4px';
-            div.innerHTML = `> ${new Date().toLocaleTimeString()} - ${message}`;
-            log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
-        }
-        
-        function showMessage(message, type = 'success') {
-            const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}</div>`;
-            setTimeout(() => container.innerHTML = '', 5000);
-        }
-        
-        function generateNewId() {
-            if (!articles || articles.length === 0) return 1;
-            return Math.max(...articles.map(a => a.id)) + 1;
-        }
-        
-        // Save config
-        document.getElementById('saveConfigBtn').addEventListener('click', () => {
-            gitConfig.token = document.getElementById('githubToken').value;
-            gitConfig.repo = document.getElementById('githubRepo').value;
-            localStorage.setItem('github_token', gitConfig.token);
-            localStorage.setItem('github_repo', gitConfig.repo);
-            addToLog('✅ GitHub configuration saved!');
-            showMessage('GitHub configuration saved!', 'success');
-        });
-        
-        // Push to GitHub using API
-        async function pushToGitHub(filePath, content, commitMessage) {
-            if (!gitConfig.token || !gitConfig.repo) {
-                addToLog('❌ Please configure GitHub token and repo first!', true);
-                return false;
-            }
-            
-            const apiUrl = `https://api.github.com/repos/${gitConfig.repo}/contents/${filePath}`;
-            
-            try {
-                // First, get the current file SHA if it exists
-                let sha = null;
+        // Load articles from localStorage first, then from window.articles
+        function loadArticles() {
+            // Try to load from localStorage
+            const stored = localStorage.getItem('newsflash_articles');
+            if (stored && stored !== 'undefined') {
                 try {
-                    const getResponse = await fetch(apiUrl, {
-                        headers: {
-                            'Authorization': `token ${gitConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
-                    if (getResponse.ok) {
-                        const data = await getResponse.json();
-                        sha = data.sha;
+                    const parsed = JSON.parse(stored);
+                    if (parsed && parsed.length > 0) {
+                        articles = parsed;
+                        addLog(`📦 Loaded ${articles.length} articles from localStorage`, false);
+                        saveToLocalStorage();
+                        renderArticlesList();
+                        updatePreview();
+                        return;
                     }
                 } catch(e) {}
-                
-                // Prepare content (base64 encode)
-                const base64Content = btoa(unescape(encodeURIComponent(content)));
-                
-                // Push the file
-                const response = await fetch(apiUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${gitConfig.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: commitMessage,
-                        content: base64Content,
-                        sha: sha,
-                        branch: 'main'
-                    })
-                });
-                
-                if (response.ok) {
-                    addToLog(`✅ Pushed: ${filePath}`);
-                    return true;
-                } else {
-                    const error = await response.json();
-                    addToLog(`❌ Failed to push ${filePath}: ${error.message}`, true);
-                    return false;
-                }
-            } catch (error) {
-                addToLog(`❌ Error: ${error.message}`, true);
-                return false;
             }
+            
+            // Fallback to window.articles from data.js
+            if (typeof window !== 'undefined' && window.articles && window.articles.length > 0) {
+                articles = [...window.articles];
+                addLog(`📚 Loaded ${articles.length} articles from data.js`, false);
+                saveToLocalStorage();
+            } else {
+                // Default articles if nothing exists
+                articles = [];
+                addLog(`📝 No articles found. Create your first article!`, false);
+            }
+            
+            renderArticlesList();
+            updatePreview();
         }
         
-        // Generate data.js content
+        function saveToLocalStorage() {
+            localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+            document.getElementById('currentArticleCount').innerText = articles.length;
+        }
+        
+        function addLog(message, isError = false) {
+            const log = document.getElementById('logConsole');
+            const div = document.createElement('div');
+            div.style.color = isError ? '#ff8888' : '#88ff88';
+            div.style.marginTop = '4px';
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+        
+        function showMessage(msg, isError = false) {
+            const area = document.getElementById('messageArea');
+            area.innerHTML = `<div class="${isError ? 'alert-error' : 'alert-success'}">${msg}</div>`;
+            setTimeout(() => area.innerHTML = '', 5000);
+        }
+        
+        // Generate the complete data.js content
         function generateDataJS() {
-            return `// Auto-generated data file - Last updated: ${new Date().toISOString()}
-export const articles = ${JSON.stringify(articles, null, 2)};
+            return `// Main articles data store - Auto-generated by Admin Panel on ${new Date().toISOString()}
+export let articles = ${JSON.stringify(articles, null, 2)};
 
 export function saveArticles() {
     localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+    console.log('✅ Articles saved to localStorage:', articles.length, 'articles');
+    return true;
 }
 
 export function loadArticlesFromStorage() {
-    const stored = localStorage.getItem('newsflash_articles');
-    if (stored) {
-        const loaded = JSON.parse(stored);
-        articles.length = 0;
-        articles.push(...loaded);
+    const saved = localStorage.getItem('newsflash_articles');
+    if (saved && saved !== 'undefined') {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.length > 0) {
+                console.log('📦 Loaded from localStorage:', parsed.length, 'articles');
+                articles.length = 0;
+                articles.push(...parsed);
+                return true;
+            }
+        } catch(e) {
+            console.error('Error loading from localStorage:', e);
+        }
     }
-    return articles;
+    console.log('📁 Using default articles from data.js');
+    return false;
+}
+
+// Auto-load on import
+loadArticlesFromStorage();
+
+// Make available globally
+if (typeof window !== 'undefined') {
+    window.articles = articles;
+    window.saveArticles = saveArticles;
+    window.loadArticlesFromStorage = loadArticlesFromStorage;
 }
 `;
         }
         
-        // Convert dataURL to base64 for image push
-        async function pushImageToGitHub(imageDataURL, filename) {
-            if (!imageDataURL) return false;
+        // Push to GitHub API
+        async function pushToGitHub(filePath, content, commitMessage) {
+            const token = document.getElementById('githubToken').value;
+            const repo = document.getElementById('githubRepo').value;
+            const branch = document.getElementById('githubBranch').value;
             
-            // Convert dataURL to base64 without the prefix
-            const base64 = imageDataURL.split(',')[1];
-            const apiUrl = `https://api.github.com/repos/${gitConfig.repo}/contents/img/${filename}`;
+            if (!token || !repo) {
+                addLog('❌ GitHub token or repo not configured', true);
+                return false;
+            }
+            
+            const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
             
             try {
-                // Get SHA if exists
-                let sha = null;
-                try {
-                    const getResponse = await fetch(apiUrl, {
-                        headers: { 'Authorization': `token ${gitConfig.token}` }
-                    });
-                    if (getResponse.ok) {
-                        const data = await getResponse.json();
-                        sha = data.sha;
-                    }
-                } catch(e) {}
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
                 
-                const response = await fetch(apiUrl, {
+                // Get current file SHA if exists
+                let sha = null;
+                const getRes = await fetch(`${apiUrl}?ref=${branch}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                if (getRes.ok) {
+                    const data = await getRes.json();
+                    sha = data.sha;
+                    addLog(`📄 Existing file found: ${filePath}`);
+                }
+                
+                // Push file
+                const pushRes = await fetch(apiUrl, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `token ${gitConfig.token}`,
+                        'Authorization': `token ${token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: `Add/update image: ${filename}`,
-                        content: base64,
+                        message: commitMessage,
+                        content: encodedContent,
                         sha: sha,
-                        branch: 'main'
+                        branch: branch
                     })
                 });
                 
-                if (response.ok) {
-                    addToLog(`✅ Pushed image: img/${filename}`);
+                if (pushRes.ok) {
+                    addLog(`✅ Pushed: ${filePath}`);
                     return true;
+                } else {
+                    const error = await pushRes.json();
+                    addLog(`❌ Failed: ${error.message}`, true);
+                    return false;
                 }
-                return false;
-            } catch(error) {
-                addToLog(`❌ Image push failed: ${error.message}`, true);
+            } catch (err) {
+                addLog(`❌ Error: ${err.message}`, true);
                 return false;
             }
         }
         
+        // Save article and push to GitHub
+        async function saveAndPush() {
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const category = document.getElementById('category').value;
+            let date = document.getElementById('date').value;
+            let imageUrl = document.getElementById('imageUrl').value.trim();
+            const fullContent = document.getElementById('fullContent').value.trim() || description;
+            
+            if (!title || !description) {
+                showMessage('Please fill title and description', true);
+                return false;
+            }
+            
+            if (!date) {
+                date = new Date().toISOString().split('T')[0];
+            }
+            
+            if (!imageUrl && currentImageName) {
+                imageUrl = `img/${currentImageName}`;
+            }
+            if (!imageUrl) {
+                imageUrl = 'https://picsum.photos/id/1/400/240';
+            }
+            
+            const newId = currentEditId || (articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 : 1);
+            
+            const article = {
+                id: newId,
+                title,
+                description,
+                fullContent,
+                category,
+                date,
+                imageUrl,
+                alt: title
+            };
+            
+            if (currentEditId) {
+                const index = articles.findIndex(a => a.id === currentEditId);
+                if (index !== -1) articles[index] = article;
+                showMessage(`✅ Article "${title}" updated!`);
+                addLog(`📝 Updated article: "${title}" (ID: ${newId})`);
+            } else {
+                articles.push(article);
+                showMessage(`✅ Article "${title}" added!`);
+                addLog(`📝 New article: "${title}" (ID: ${newId})`);
+            }
+            
+            saveToLocalStorage();
+            renderArticlesList();
+            
+            // Push to GitHub
+            addLog(`🚀 Pushing to GitHub...`);
+            const dataJSContent = generateDataJS();
+            const success = await pushToGitHub('js/data.js', dataJSContent, `Update articles: ${title}`);
+            
+            if (success) {
+                addLog(`🎉 Successfully pushed to GitHub! Site will update in 1-2 minutes.`);
+                showMessage(`Article saved AND pushed to GitHub! View at index.html`);
+                document.getElementById('gitStatus').innerHTML = '<i class="fas fa-check-circle"></i> Synced!';
+                setTimeout(() => {
+                    document.getElementById('gitStatus').innerHTML = '<i class="fas fa-circle" style="color: #28a745;"></i> Ready';
+                }, 3000);
+            } else {
+                addLog(`⚠️ Article saved locally but GitHub push failed`, true);
+                showMessage(`Article saved locally. Check GitHub token permissions.`, true);
+            }
+            
+            resetForm();
+            return success;
+        }
+        
+        // Image upload handling
         function setupImageUpload() {
             const uploadArea = document.getElementById('uploadArea');
             const imageFile = document.getElementById('imageFile');
@@ -613,14 +606,14 @@ export function loadArticlesFromStorage() {
             uploadArea.ondrop = (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#ddd';
-                if (e.dataTransfer.files[0]) handleImageFile(e.dataTransfer.files[0]);
+                if (e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]);
             };
-            imageFile.onchange = (e) => { if(e.target.files[0]) handleImageFile(e.target.files[0]); };
+            imageFile.onchange = (e) => { if(e.target.files[0]) handleImage(e.target.files[0]); };
         }
         
-        function handleImageFile(file) {
+        function handleImage(file) {
             if (!file.type.match('image.*')) {
-                showMessage('Please upload an image file', 'error');
+                showMessage('Please upload an image file', true);
                 return;
             }
             
@@ -630,12 +623,9 @@ export function loadArticlesFromStorage() {
                 const ext = file.name.split('.').pop();
                 currentImageName = `article_${Date.now()}.${ext}`;
                 
-                document.getElementById('imagePreviewContainer').innerHTML = `
-                    <div class="uploaded-image-preview">
-                        <img src="${currentImageData}" style="width:100px;height:100px;object-fit:cover;border-radius:8px">
-                        <div class="remove-image" onclick="clearImage()">×</div>
-                    </div>
-                    <div style="font-size:12px;">${currentImageName}</div>
+                document.getElementById('imagePreview').innerHTML = `
+                    <img src="${currentImageData}" alt="preview">
+                    <button type="button" onclick="clearImage()" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">Remove</button>
                 `;
                 document.getElementById('imageUrl').value = `img/${currentImageName}`;
                 updatePreview();
@@ -646,126 +636,35 @@ export function loadArticlesFromStorage() {
         window.clearImage = function() {
             currentImageData = null;
             currentImageName = null;
-            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('imagePreview').innerHTML = '';
             document.getElementById('imageUrl').value = '';
             updatePreview();
         };
         
         function updatePreview() {
             const title = document.getElementById('title').value || 'Article Title';
-            const description = document.getElementById('description').value || 'Description';
+            const description = document.getElementById('description').value || 'Description here...';
             const category = document.getElementById('category').value || 'Category';
-            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
             let imageUrl = document.getElementById('imageUrl').value;
             if (currentImageData) imageUrl = currentImageData;
-            if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200';
+            if (!imageUrl) imageUrl = 'https://picsum.photos/id/1/400/240';
             
             document.getElementById('livePreview').innerHTML = `
-                <div class="preview-card">
-                    <img src="${imageUrl}" alt="Preview">
-                    <div class="preview-content">
-                        <span class="preview-category">${category}</span>
-                        <h3>${title}</h3>
-                        <p>${description.substring(0, 100)}</p>
-                        <small>${date}</small>
-                    </div>
+                <img src="${imageUrl}" style="width: 100%; height: 150px; object-fit: cover;">
+                <div style="padding: 15px;">
+                    <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${category}</span>
+                    <h3 style="margin: 10px 0;">${title.substring(0, 50)}</h3>
+                    <p style="color: #666;">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
                 </div>
             `;
         }
         
-        // Main save handler with auto Git push
-        document.getElementById('articleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const title = document.getElementById('title').value.trim();
-            const description = document.getElementById('description').value.trim();
-            const category = document.getElementById('category').value;
-            const date = document.getElementById('date').value;
-            let imageUrl = document.getElementById('imageUrl').value.trim();
-            const fullContent = document.getElementById('fullContent').value.trim() || description;
-            
-            if (!title || !description || !category || !date) {
-                showMessage('Please fill all required fields', 'error');
-                return;
-            }
-            
-            // Disable save button during push
-            const saveBtn = document.getElementById('saveBtn');
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing to GitHub...';
-            
-            try {
-                if (!imageUrl && currentImageName) {
-                    imageUrl = `img/${currentImageName}`;
-                }
-                if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200';
-                
-                const newArticle = {
-                    id: currentEditId || generateNewId(),
-                    title,
-                    description,
-                    category,
-                    date,
-                    imageUrl,
-                    alt: title,
-                    fullContent
-                };
-                
-                if (currentEditId) {
-                    const index = articles.findIndex(a => a.id === currentEditId);
-                    if (index !== -1) articles[index] = newArticle;
-                    showMessage(`✅ Article "${title}" updated!`, 'success');
-                    currentEditId = null;
-                    document.getElementById('formTitle').textContent = 'Add New Article';
-                } else {
-                    articles.push(newArticle);
-                    showMessage(`✅ Article "${title}" added!`, 'success');
-                }
-                
-                saveArticles();
-                loadArticlesList();
-                
-                addToLog(`📝 Starting GitHub push for "${title}"...`);
-                
-                // Push data.js to GitHub
-                const dataJSContent = generateDataJS();
-                const pushSuccess = await pushToGitHub(
-                    'js/data.js',
-                    dataJSContent,
-                    `Update articles: ${title}`
-                );
-                
-                // Push image if uploaded
-                let imagePushSuccess = true;
-                if (currentImageData && currentImageName) {
-                    imagePushSuccess = await pushImageToGitHub(currentImageData, currentImageName);
-                }
-                
-                if (pushSuccess && imagePushSuccess) {
-                    addToLog(`🎉 Successfully pushed all changes to GitHub!`);
-                    showMessage(`Article saved AND pushed to GitHub! View your site in 1-2 minutes.`, 'success');
-                } else {
-                    addToLog(`⚠️ Some files failed to push. Check your GitHub config.`, true);
-                    showMessage(`Article saved locally but GitHub push had issues. Check the log.`, 'error');
-                }
-                
-                resetForm();
-                
-            } catch (error) {
-                addToLog(`❌ Error: ${error.message}`, true);
-                showMessage(`Error: ${error.message}`, 'error');
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '<i class="fab fa-github"></i> Save & Push to GitHub';
-            }
-        });
-        
-        function loadArticlesList() {
+        function renderArticlesList() {
             const container = document.getElementById('articlesList');
             const countSpan = document.getElementById('articleCount');
             
             if (!articles || articles.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">No articles yet</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No articles yet. Create your first article!</div>';
                 countSpan.textContent = '(0)';
                 return;
             }
@@ -775,12 +674,12 @@ export function loadArticlesFromStorage() {
                 <div class="article-item">
                     <div class="article-info">
                         <h3>#${article.id} - ${article.title}</h3>
-                        <p>${article.description.substring(0, 100)}</p>
+                        <p style="color: #666;">${article.description.substring(0, 100)}</p>
                         <small>${article.category} | ${article.date}</small>
                     </div>
-                    <div class="article-actions">
-                        <button onclick="window.editArticle(${article.id})" style="background:#28a745;">Edit</button>
-                        <button onclick="window.deleteArticle(${article.id})" style="background:#dc3545;">Delete</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="editArticle(${article.id})" class="btn btn-success" style="padding: 5px 12px; font-size: 12px;">Edit</button>
+                        <button onclick="deleteArticle(${article.id})" class="btn btn-danger" style="padding: 5px 12px; font-size: 12px;">Delete</button>
                     </div>
                 </div>
             `).join('');
@@ -796,9 +695,10 @@ export function loadArticlesFromStorage() {
                 document.getElementById('imageUrl').value = article.imageUrl;
                 document.getElementById('fullContent').value = article.fullContent || '';
                 currentEditId = article.id;
-                document.getElementById('formTitle').textContent = `Edit Article #${article.id}`;
+                document.getElementById('saveBtn').innerHTML = '<i class="fab fa-github"></i> Update & Push';
                 updatePreview();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo(0, 0);
+                addLog(`✏️ Editing article: ${article.title}`);
             }
         };
         
@@ -807,16 +707,16 @@ export function loadArticlesFromStorage() {
             if (article && confirm(`Delete "${article.title}"?`)) {
                 const index = articles.findIndex(a => a.id === id);
                 articles.splice(index, 1);
-                saveArticles();
-                loadArticlesList();
-                showMessage(`Deleted "${article.title}"`, 'success');
-                if (currentEditId === id) resetForm();
+                saveToLocalStorage();
+                renderArticlesList();
+                showMessage(`Deleted "${article.title}"`);
+                addLog(`🗑️ Deleted article: ${article.title}`);
                 
                 // Push deletion to GitHub
-                addToLog(`🗑️ Deleting article, pushing changes...`);
                 const dataJSContent = generateDataJS();
                 await pushToGitHub('js/data.js', dataJSContent, `Delete article: ${article.title}`);
-                addToLog(`✅ Deletion pushed to GitHub`);
+                
+                if (currentEditId === id) resetForm();
             }
         };
         
@@ -825,31 +725,105 @@ export function loadArticlesFromStorage() {
             currentEditId = null;
             currentImageData = null;
             currentImageName = null;
-            document.getElementById('formTitle').textContent = 'Add New Article';
+            document.getElementById('imagePreview').innerHTML = '';
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('saveBtn').innerHTML = '<i class="fab fa-github"></i> Save & Push to GitHub';
             document.getElementById('imageUrl').value = '';
             updatePreview();
         }
         
+        // Sync from localStorage (in case data.js was updated externally)
+        function syncFromStorage() {
+            const stored = localStorage.getItem('newsflash_articles');
+            if (stored && stored !== 'undefined') {
+                try {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && parsed.length > 0) {
+                        articles = parsed;
+                        saveToLocalStorage();
+                        renderArticlesList();
+                        addLog(`🔄 Synced ${articles.length} articles from localStorage`);
+                        showMessage(`Synced ${articles.length} articles from storage!`);
+                        return;
+                    }
+                } catch(e) {}
+            }
+            addLog(`⚠️ No data found in localStorage`, true);
+            showMessage(`No data found in localStorage`, true);
+        }
+        
+        // Test GitHub connection
+        async function testConnection() {
+            const token = document.getElementById('githubToken').value;
+            const repo = document.getElementById('githubRepo').value;
+            
+            if (!token || !repo) {
+                showMessage('Please enter token and repo', true);
+                return;
+            }
+            
+            addLog('🔍 Testing GitHub connection...');
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${repo}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    addLog(`✅ Connected to ${data.full_name}!`);
+                    addLog(`📁 Default branch: ${data.default_branch}`);
+                    showMessage(`Connected to ${data.full_name}`);
+                } else {
+                    const err = await res.json();
+                    addLog(`❌ Failed: ${err.message}`, true);
+                    showMessage(`Error: ${err.message}`, true);
+                }
+            } catch (err) {
+                addLog(`❌ Error: ${err.message}`, true);
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('articleForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveAndPush();
+        });
+        
         document.getElementById('resetBtn').addEventListener('click', resetForm);
+        document.getElementById('testBtn').addEventListener('click', testConnection);
+        document.getElementById('syncFromStorageBtn').addEventListener('click', syncFromStorage);
+        
+        document.getElementById('saveConfigBtn').addEventListener('click', () => {
+            const token = document.getElementById('githubToken').value;
+            const repo = document.getElementById('githubRepo').value;
+            const branch = document.getElementById('githubBranch').value;
+            localStorage.setItem('github_token', token);
+            localStorage.setItem('github_repo', repo);
+            localStorage.setItem('github_branch', branch);
+            addLog('✅ Configuration saved to localStorage');
+            showMessage('Configuration saved!');
+        });
+        
         document.getElementById('title').addEventListener('input', updatePreview);
         document.getElementById('description').addEventListener('input', updatePreview);
         document.getElementById('category').addEventListener('change', updatePreview);
-        document.getElementById('date').addEventListener('change', updatePreview);
         document.getElementById('imageUrl').addEventListener('input', updatePreview);
         
-        loadArticlesFromStorage();
-        setupImageUpload();
-        resetForm();
-        loadArticlesList();
+        // Load saved config
+        const savedToken = localStorage.getItem('github_token');
+        const savedRepo = localStorage.getItem('github_repo');
+        const savedBranch = localStorage.getItem('github_branch');
+        if (savedToken) document.getElementById('githubToken').value = savedToken;
+        if (savedRepo) document.getElementById('githubRepo').value = savedRepo;
+        if (savedBranch) document.getElementById('githubBranch').value = savedBranch;
         
-        addToLog('🚀 Admin panel ready with auto Git push!');
-        if (!gitConfig.token || !gitConfig.repo) {
-            addToLog('⚠️ Please configure your GitHub token and repo above to enable auto-push', true);
-        } else {
-            addToLog('✅ GitHub configured and ready!');
-        }
+        // Initialize
+        setupImageUpload();
+        loadArticles();
+        resetForm();
+        
+        addLog('🚀 Admin panel ready! Configure GitHub and start publishing.');
     </script>
 </body>
 </html>
