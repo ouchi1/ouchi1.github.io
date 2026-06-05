@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsFlash - Admin Panel with Live Sync</title>
+    <title>NewsFlash - Auto Git Push Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -28,7 +28,7 @@
             color: white;
             padding: 30px;
             border-radius: 10px;
-            margin-bottom: 30px;
+ margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -36,32 +36,52 @@
             gap: 15px;
         }
         
-        .view-site-btn {
-            background: rgba(255,255,255,0.2);
+        .github-config {
+            background: #24292e;
             color: white;
-            padding: 10px 20px;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .config-input {
+            background: white;
+            color: #333;
+            padding: 8px 12px;
             border-radius: 5px;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            margin: 5px;
+            width: 300px;
+            border: none;
         }
         
-        .view-site-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
         }
         
-        .sync-status {
+        .status-success {
             background: #28a745;
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        }
+        
+        .status-error {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .status-pushing {
+            background: #ffc107;
+            color: #333;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
         
         .admin-panel {
@@ -124,27 +144,6 @@
             background: #f0f0ff;
         }
         
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #e8e8ff;
-        }
-        
-        .upload-icon {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .upload-text {
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .upload-hint {
-            font-size: 12px;
-            color: #999;
-        }
-        
         .image-preview-area {
             margin-top: 15px;
             display: flex;
@@ -182,38 +181,6 @@
             font-size: 12px;
         }
         
-        .existing-images {
-            margin-top: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .existing-image-item {
-            display: inline-block;
-            margin: 5px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .existing-image-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .existing-image-item img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid transparent;
-        }
-        
-        .existing-image-item.selected img {
-            border-color: #28a745;
-        }
-        
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -231,16 +198,13 @@
             transform: translateY(-1px);
         }
         
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .btn-secondary {
             background: #6c757d;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-        }
-        
-        .btn-sync {
-            background: #28a745;
         }
         
         .article-list {
@@ -258,11 +222,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
-        }
-        
-        .article-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .article-info {
@@ -272,15 +231,6 @@
         .article-info h3 {
             margin-bottom: 5px;
             color: #333;
-        }
-        
-        .article-info p {
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .article-info small {
-            color: #999;
         }
         
         .article-actions button {
@@ -327,7 +277,6 @@
             width: 100%;
             height: 200px;
             object-fit: cover;
-            background: #f0f0f0;
         }
         
         .preview-card .preview-content {
@@ -353,51 +302,22 @@
             font-size: 14px;
         }
         
-        .live-badge {
-            display: inline-block;
-            background: #dc3545;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-left: 10px;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        .log-console {
+            background: #1e1e2f;
+            color: #0f0;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
         }
         
         @media (max-width: 768px) {
             .admin-panel {
                 grid-template-columns: 1fr;
             }
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-        
-        .path-hint {
-            font-size: 12px;
-            color: #28a745;
-            margin-top: 5px;
-        }
-        
-        .iframe-container {
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            background: white;
-        }
-        
-        .iframe-container iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
         }
     </style>
 </head>
@@ -405,19 +325,26 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1><i class="fas fa-newspaper"></i> NewsFlash Admin Panel</h1>
-                <p>Manage your news articles - with live website preview!</p>
+                <h1><i class="fab fa-github"></i> NewsFlash Admin + Auto Git Push</h1>
+                <p>Save articles - Auto push to GitHub via API</p>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <div class="sync-status" id="syncStatus">
-                    <i class="fas fa-check-circle"></i> Live Sync Active
-                </div>
-                <a href="index.html" class="view-site-btn" target="_blank" id="viewSiteBtn">
-                    <i class="fas fa-external-link-alt"></i> Open Main Site
-                </a>
-                <button onclick="refreshMainSite()" class="view-site-btn" style="background: rgba(255,255,255,0.2);">
-                    <i class="fas fa-sync-alt"></i> Refresh Site
-                </button>
+            <a href="index.html" class="view-site-btn" target="_blank" style="background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+                <i class="fas fa-external-link-alt"></i> View Main Site
+            </a>
+        </div>
+        
+        <!-- GitHub Configuration -->
+        <div class="github-config">
+            <h3 style="margin-bottom: 15px;"><i class="fab fa-github"></i> GitHub Auto-Push Setup</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                <input type="text" id="githubToken" class="config-input" placeholder="GitHub Personal Access Token" style="flex: 1;">
+                <input type="text" id="githubRepo" class="config-input" placeholder="username/repo (e.g., john/newsflash)" style="flex: 1;">
+                <button id="saveConfigBtn" style="background: #28a745; padding: 8px 20px;">Save Config</button>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px; color: #ccc;">
+                <i class="fas fa-info-circle"></i> Need a token? 
+                <a href="https://github.com/settings/tokens" target="_blank" style="color: #ffd700;">Create one here</a> 
+                (Requires 'repo' scope)
             </div>
         </div>
         
@@ -434,20 +361,17 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="description">Description / Excerpt *</label>
-                        <textarea id="description" required placeholder="Brief summary of the article (shown in news grid)"></textarea>
+                        <label for="description">Description *</label>
+                        <textarea id="description" required placeholder="Brief summary"></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="category">Category *</label>
                         <select id="category" required>
                             <option value="News">📰 News</option>
-                            <option value="Politics">🏛️ Politics</option>
                             <option value="Technology">💻 Technology</option>
                             <option value="Business">📈 Business</option>
-                            <option value="Opinion">💭 Opinion</option>
                             <option value="Sports">⚽ Sports</option>
-                            <option value="Entertainment">🎬 Entertainment</option>
                         </select>
                     </div>
                     
@@ -461,69 +385,49 @@
                         <div id="uploadArea" class="upload-area">
                             <i class="fas fa-cloud-upload-alt upload-icon"></i>
                             <div class="upload-text">Click or drag & drop an image here</div>
-                            <div class="upload-hint">Supports JPG, PNG, GIF (Max 5MB)</div>
-                            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                            <input type="file" id="imageFile" accept="image/*" style="display: none;">
                         </div>
                         <div id="imagePreviewContainer" class="image-preview-area"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label><i class="fas fa-folder-open"></i> Or Select Existing Image</label>
-                        <div id="existingImagesContainer" class="existing-images">
-                            <div style="color: #999; text-align: center;">Loading existing images...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label><i class="fas fa-link"></i> Or Enter Image Path Manually</label>
+                        <label>Image Path</label>
                         <input type="text" id="imageUrl" placeholder="img/your-image.jpg">
-                        <div class="path-hint" id="pathHint"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="alt">Image Alt Text</label>
-                        <input type="text" id="alt" placeholder="Description for accessibility and SEO">
+                        <label for="fullContent">Full Content</label>
+                        <textarea id="fullContent" rows="8" placeholder="Full article content"></textarea>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="fullContent">Full Article Content *</label>
-                        <textarea id="fullContent" rows="8" placeholder="Write your full article here. Use \n\n to create new paragraphs."></textarea>
-                    </div>
-                    
-                    <button type="submit" id="saveBtn"><i class="fas fa-save"></i> Save Article & Update Site</button>
-                    <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset Form</button>
+                    <button type="submit" id="saveBtn"><i class="fab fa-github"></i> Save & Push to GitHub</button>
+                    <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset</button>
                 </form>
             </div>
             
             <div class="preview-section">
-                <h2><i class="fas fa-eye"></i> Live Preview 
-                    <span class="live-badge">LIVE</span>
-                </h2>
+                <h2><i class="fas fa-eye"></i> Live Preview</h2>
                 <div id="livePreview">
                     <div class="preview-card">
-                        <img src="https://via.placeholder.com/400x200?text=Preview" alt="Preview">
+                        <img src="https://via.placeholder.com/400x200" alt="Preview">
                         <div class="preview-content">
                             <span class="preview-category">Category</span>
-                            <h3 style="margin: 10px 0;">Article Title</h3>
-                            <p style="color: #666;">Your article description will appear here...</p>
-                            <small style="color: #999;">YYYY-MM-DD</small>
+                            <h3>Article Title</h3>
+                            <p>Description...</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="iframe-container">
-                    <h4 style="padding: 10px; background: #f8f9fa; margin: 0; border-bottom: 1px solid #ddd;">
-                        <i class="fas fa-globe"></i> Main Website Preview
-                    </h4>
-                    <iframe id="mainSitePreview" src="index.html" title="Main Website Preview"></iframe>
+                <!-- Git Push Log -->
+                <div class="log-console" id="gitLog">
+                    <div>> Ready to auto-push to GitHub</div>
+                    <div>> Configure your GitHub token and repo above</div>
                 </div>
             </div>
         </div>
         
         <div class="article-list">
-            <h2><i class="fas fa-list"></i> All Articles 
-                <span class="stats" id="articleCount"></span>
-            </h2>
+            <h2><i class="fas fa-list"></i> All Articles <span class="stats" id="articleCount"></span></h2>
             <div id="articlesList"></div>
         </div>
     </div>
@@ -532,37 +436,31 @@
         import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
         
         let currentEditId = null;
-        let currentUploadedImage = null;
-        let currentImagePath = '';
-        
-        // Function to refresh the main site preview
-        window.refreshMainSite = function() {
-            const iframe = document.getElementById('mainSitePreview');
-            if (iframe) {
-                const currentSrc = iframe.src;
-                iframe.src = currentSrc;
-                showMessage('Main website preview refreshed!', 'success');
-            }
-            // Also try to reload the actual index.html data
-            if (window.opener && !window.opener.closed) {
-                try {
-                    window.opener.location.reload();
-                } catch(e) {}
-            }
+        let currentImageData = null;
+        let currentImageName = null;
+        let gitConfig = {
+            token: localStorage.getItem('github_token') || '',
+            repo: localStorage.getItem('github_repo') || ''
         };
         
-        // Function to open main site with cache bust
-        document.getElementById('viewSiteBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            window.open('index.html?t=' + Date.now(), '_blank');
-        });
+        // Load saved config
+        if (gitConfig.token) document.getElementById('githubToken').value = gitConfig.token;
+        if (gitConfig.repo) document.getElementById('githubRepo').value = gitConfig.repo;
+        
+        function addToLog(message, isError = false) {
+            const log = document.getElementById('gitLog');
+            const div = document.createElement('div');
+            div.style.color = isError ? '#ff6b6b' : '#0f0';
+            div.style.marginTop = '4px';
+            div.innerHTML = `> ${new Date().toLocaleTimeString()} - ${message}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
         
         function showMessage(message, type = 'success') {
             const container = document.getElementById('messageContainer');
             container.innerHTML = `<div class="${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}</div>`;
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 4000);
+            setTimeout(() => container.innerHTML = '', 5000);
         }
         
         function generateNewId() {
@@ -570,80 +468,154 @@
             return Math.max(...articles.map(a => a.id)) + 1;
         }
         
-        async function loadExistingImages() {
-            const container = document.getElementById('existingImagesContainer');
-            const knownImages = ['1.jpg', '2.jpg', '10.jpg', '14.jpg', '15.jpg', '16.jpg', 'ID_9.png', 'logo.png'];
-            const detectedImages = [];
+        // Save config
+        document.getElementById('saveConfigBtn').addEventListener('click', () => {
+            gitConfig.token = document.getElementById('githubToken').value;
+            gitConfig.repo = document.getElementById('githubRepo').value;
+            localStorage.setItem('github_token', gitConfig.token);
+            localStorage.setItem('github_repo', gitConfig.repo);
+            addToLog('✅ GitHub configuration saved!');
+            showMessage('GitHub configuration saved!', 'success');
+        });
+        
+        // Push to GitHub using API
+        async function pushToGitHub(filePath, content, commitMessage) {
+            if (!gitConfig.token || !gitConfig.repo) {
+                addToLog('❌ Please configure GitHub token and repo first!', true);
+                return false;
+            }
             
-            for (let i = 1; i <= 30; i++) {
-                const testUrl = `img/${i}.jpg`;
+            const apiUrl = `https://api.github.com/repos/${gitConfig.repo}/contents/${filePath}`;
+            
+            try {
+                // First, get the current file SHA if it exists
+                let sha = null;
                 try {
-                    const response = await fetch(testUrl, { method: 'HEAD' });
-                    if (response.ok) detectedImages.push(`${i}.jpg`);
+                    const getResponse = await fetch(apiUrl, {
+                        headers: {
+                            'Authorization': `token ${gitConfig.token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        sha = data.sha;
+                    }
                 } catch(e) {}
-            }
-            
-            const allImages = [...new Set([...knownImages, ...detectedImages])];
-            
-            if (allImages.length === 0) {
-                container.innerHTML = '<div style="color: #999; text-align: center;">No existing images found. Upload one first!</div>';
-                return;
-            }
-            
-            container.innerHTML = `
-                <div style="margin-bottom: 10px; color: #666; font-size: 12px;">Click to select an existing image:</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    ${allImages.map(img => `
-                        <div class="existing-image-item" data-path="img/${img}">
-                            <img src="img/${img}?t=${Date.now()}" alt="${img}" onerror="this.parentElement.style.display='none'">
-                            <div style="font-size: 10px; text-align: center;">${img}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            document.querySelectorAll('.existing-image-item').forEach(el => {
-                el.addEventListener('click', () => {
-                    const path = el.dataset.path;
-                    selectExistingImage(path);
-                    document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
-                    el.classList.add('selected');
+                
+                // Prepare content (base64 encode)
+                const base64Content = btoa(unescape(encodeURIComponent(content)));
+                
+                // Push the file
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${gitConfig.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: commitMessage,
+                        content: base64Content,
+                        sha: sha,
+                        branch: 'main'
+                    })
                 });
-            });
+                
+                if (response.ok) {
+                    addToLog(`✅ Pushed: ${filePath}`);
+                    return true;
+                } else {
+                    const error = await response.json();
+                    addToLog(`❌ Failed to push ${filePath}: ${error.message}`, true);
+                    return false;
+                }
+            } catch (error) {
+                addToLog(`❌ Error: ${error.message}`, true);
+                return false;
+            }
         }
         
-        function selectExistingImage(path) {
-            currentImagePath = path;
-            document.getElementById('imageUrl').value = path;
-            document.getElementById('pathHint').innerHTML = `<i class="fas fa-check-circle"></i> Selected: ${path}`;
-            currentUploadedImage = null;
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-            updatePreviewWithImage(path);
-            showMessage(`Selected image: ${path}`, 'info');
+        // Generate data.js content
+        function generateDataJS() {
+            return `// Auto-generated data file - Last updated: ${new Date().toISOString()}
+export const articles = ${JSON.stringify(articles, null, 2)};
+
+export function saveArticles() {
+    localStorage.setItem('newsflash_articles', JSON.stringify(articles));
+}
+
+export function loadArticlesFromStorage() {
+    const stored = localStorage.getItem('newsflash_articles');
+    if (stored) {
+        const loaded = JSON.parse(stored);
+        articles.length = 0;
+        articles.push(...loaded);
+    }
+    return articles;
+}
+`;
+        }
+        
+        // Convert dataURL to base64 for image push
+        async function pushImageToGitHub(imageDataURL, filename) {
+            if (!imageDataURL) return false;
+            
+            // Convert dataURL to base64 without the prefix
+            const base64 = imageDataURL.split(',')[1];
+            const apiUrl = `https://api.github.com/repos/${gitConfig.repo}/contents/img/${filename}`;
+            
+            try {
+                // Get SHA if exists
+                let sha = null;
+                try {
+                    const getResponse = await fetch(apiUrl, {
+                        headers: { 'Authorization': `token ${gitConfig.token}` }
+                    });
+                    if (getResponse.ok) {
+                        const data = await getResponse.json();
+                        sha = data.sha;
+                    }
+                } catch(e) {}
+                
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${gitConfig.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Add/update image: ${filename}`,
+                        content: base64,
+                        sha: sha,
+                        branch: 'main'
+                    })
+                });
+                
+                if (response.ok) {
+                    addToLog(`✅ Pushed image: img/${filename}`);
+                    return true;
+                }
+                return false;
+            } catch(error) {
+                addToLog(`❌ Image push failed: ${error.message}`, true);
+                return false;
+            }
         }
         
         function setupImageUpload() {
             const uploadArea = document.getElementById('uploadArea');
             const imageFile = document.getElementById('imageFile');
             
-            uploadArea.addEventListener('click', () => imageFile.click());
-            uploadArea.addEventListener('dragover', (e) => {
+            uploadArea.onclick = () => imageFile.click();
+            uploadArea.ondragover = (e) => { e.preventDefault(); uploadArea.style.borderColor = '#667eea'; };
+            uploadArea.ondragleave = () => uploadArea.style.borderColor = '#ddd';
+            uploadArea.ondrop = (e) => {
                 e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                if (e.dataTransfer.files.length > 0) {
-                    handleImageFile(e.dataTransfer.files[0]);
-                }
-            });
-            imageFile.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageFile(e.target.files[0]);
-                }
-            });
+                uploadArea.style.borderColor = '#ddd';
+                if (e.dataTransfer.files[0]) handleImageFile(e.dataTransfer.files[0]);
+            };
+            imageFile.onchange = (e) => { if(e.target.files[0]) handleImageFile(e.target.files[0]); };
         }
         
         function handleImageFile(file) {
@@ -651,112 +623,57 @@
                 showMessage('Please upload an image file', 'error');
                 return;
             }
-            if (file.size > 5 * 1024 * 1024) {
-                showMessage('Image too large! Max 5MB', 'error');
-                return;
-            }
             
             const reader = new FileReader();
             reader.onload = (e) => {
-                const imageData = e.target.result;
-                currentUploadedImage = {
-                    data: imageData,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type
-                };
-                
-                const timestamp = Date.now();
+                currentImageData = e.target.result;
                 const ext = file.name.split('.').pop();
-                const filename = `upload_${timestamp}.${ext}`;
-                currentImagePath = `img/${filename}`;
+                currentImageName = `article_${Date.now()}.${ext}`;
                 
-                const container = document.getElementById('imagePreviewContainer');
-                container.innerHTML = `
+                document.getElementById('imagePreviewContainer').innerHTML = `
                     <div class="uploaded-image-preview">
-                        <img src="${imageData}" alt="Uploaded">
-                        <div class="remove-image" onclick="clearUploadedImage()">×</div>
+                        <img src="${currentImageData}" style="width:100px;height:100px;object-fit:cover;border-radius:8px">
+                        <div class="remove-image" onclick="clearImage()">×</div>
                     </div>
-                    <div style="font-size: 12px; color: #666;">
-                        <i class="fas fa-check-circle" style="color: #28a745;"></i> Ready to save: ${filename}
-                    </div>
+                    <div style="font-size:12px;">${currentImageName}</div>
                 `;
-                
-                document.getElementById('imageUrl').value = currentImagePath;
-                document.getElementById('pathHint').innerHTML = `<i class="fas fa-upload"></i> New image ready: ${filename}`;
-                updatePreviewWithImage(imageData);
-                showMessage(`Image loaded! Will be saved as ${filename}`, 'success');
+                document.getElementById('imageUrl').value = `img/${currentImageName}`;
+                updatePreview();
             };
             reader.readAsDataURL(file);
         }
         
-        window.clearUploadedImage = function() {
-            currentUploadedImage = null;
-            currentImagePath = '';
+        window.clearImage = function() {
+            currentImageData = null;
+            currentImageName = null;
             document.getElementById('imagePreviewContainer').innerHTML = '';
             document.getElementById('imageUrl').value = '';
-            document.getElementById('pathHint').innerHTML = '';
-            showMessage('Image cleared', 'info');
+            updatePreview();
         };
         
-        function updatePreviewWithImage(imageSrc) {
+        function updatePreview() {
             const title = document.getElementById('title').value || 'Article Title';
-            const description = document.getElementById('description').value || 'Article description will appear here...';
+            const description = document.getElementById('description').value || 'Description';
             const category = document.getElementById('category').value || 'Category';
             const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            let imageUrl = document.getElementById('imageUrl').value;
+            if (currentImageData) imageUrl = currentImageData;
+            if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200';
             
-            const preview = document.getElementById('livePreview');
-            preview.innerHTML = `
+            document.getElementById('livePreview').innerHTML = `
                 <div class="preview-card">
-                    <img src="${imageSrc}" alt="Preview" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
+                    <img src="${imageUrl}" alt="Preview">
                     <div class="preview-content">
                         <span class="preview-category">${category}</span>
-                        <h3 style="margin: 10px 0;">${title.substring(0, 60)}</h3>
-                        <p style="color: #666; line-height: 1.5;">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</p>
-                        <small style="color: #999;"><i class="far fa-calendar"></i> ${date}</small>
+                        <h3>${title}</h3>
+                        <p>${description.substring(0, 100)}</p>
+                        <small>${date}</small>
                     </div>
                 </div>
             `;
         }
         
-        function updatePreview() {
-            let imageUrl = document.getElementById('imageUrl').value;
-            if (!imageUrl && currentUploadedImage) {
-                imageUrl = currentUploadedImage.data;
-            } else if (!imageUrl) {
-                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
-            }
-            updatePreviewWithImage(imageUrl);
-        }
-        
-        function saveUploadedImage() {
-            if (!currentUploadedImage) return null;
-            
-            const link = document.createElement('a');
-            const filename = currentImagePath.replace('img/', '');
-            link.download = filename;
-            link.href = currentUploadedImage.data;
-            link.click();
-            
-            showMessage(`💾 Image "${filename}" downloaded. Place it in your img/ folder.`, 'info');
-            return currentImagePath;
-        }
-        
-        function resetForm() {
-            document.getElementById('articleForm').reset();
-            currentEditId = null;
-            currentUploadedImage = null;
-            currentImagePath = '';
-            document.getElementById('formTitle').textContent = 'Add New Article';
-            document.getElementById('date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-            document.getElementById('pathHint').innerHTML = '';
-            document.getElementById('imageUrl').value = '';
-            updatePreview();
-            document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
-        }
-        
-        // Handle form submission with automatic main site refresh
+        // Main save handler with auto Git push
         document.getElementById('articleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -765,113 +682,111 @@
             const category = document.getElementById('category').value;
             const date = document.getElementById('date').value;
             let imageUrl = document.getElementById('imageUrl').value.trim();
-            const alt = document.getElementById('alt').value.trim() || title;
             const fullContent = document.getElementById('fullContent').value.trim() || description;
             
             if (!title || !description || !category || !date) {
-                showMessage('Please fill in all required fields (*)', 'error');
+                showMessage('Please fill all required fields', 'error');
                 return;
             }
             
-            let imageSaveMessage = '';
-            if (currentUploadedImage) {
-                const savedPath = saveUploadedImage();
-                if (savedPath) {
-                    imageUrl = savedPath;
-                    imageSaveMessage = ` Image saved as "${savedPath}".`;
-                }
-            }
+            // Disable save button during push
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing to GitHub...';
             
-            if (!imageUrl) {
-                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
-            }
-            
-            if (currentEditId) {
-                const index = articles.findIndex(a => a.id === currentEditId);
-                if (index !== -1) {
-                    articles[index] = {
-                        ...articles[index],
-                        title,
-                        description,
-                        category,
-                        date,
-                        imageUrl,
-                        alt,
-                        fullContent
-                    };
-                    showMessage(`✅ Article "${title}" updated successfully!${imageSaveMessage}`, 'success');
+            try {
+                if (!imageUrl && currentImageName) {
+                    imageUrl = `img/${currentImageName}`;
                 }
-                currentEditId = null;
-                document.getElementById('formTitle').textContent = 'Add New Article';
-            } else {
+                if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200';
+                
                 const newArticle = {
-                    id: generateNewId(),
+                    id: currentEditId || generateNewId(),
                     title,
                     description,
                     category,
                     date,
                     imageUrl,
-                    alt,
+                    alt: title,
                     fullContent
                 };
-                articles.push(newArticle);
-                showMessage(`✅ Article "${title}" added successfully! (ID: ${newArticle.id})${imageSaveMessage}`, 'success');
-            }
-            
-            // Save to localStorage
-            saveArticles();
-            loadArticlesList();
-            
-            // 🔥 AUTO REFRESH THE MAIN WEBSITE 🔥
-            setTimeout(() => {
-                refreshMainSite();
-                showMessage('🔄 Main website has been updated! Check the preview window.', 'success');
                 
-                // Update sync status indicator
-                const syncStatus = document.getElementById('syncStatus');
-                syncStatus.style.background = '#28a745';
-                syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Synced!';
-                setTimeout(() => {
-                    syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Live Sync Active';
-                }, 2000);
-            }, 500);
-            
-            resetForm();
-            loadExistingImages();
+                if (currentEditId) {
+                    const index = articles.findIndex(a => a.id === currentEditId);
+                    if (index !== -1) articles[index] = newArticle;
+                    showMessage(`✅ Article "${title}" updated!`, 'success');
+                    currentEditId = null;
+                    document.getElementById('formTitle').textContent = 'Add New Article';
+                } else {
+                    articles.push(newArticle);
+                    showMessage(`✅ Article "${title}" added!`, 'success');
+                }
+                
+                saveArticles();
+                loadArticlesList();
+                
+                addToLog(`📝 Starting GitHub push for "${title}"...`);
+                
+                // Push data.js to GitHub
+                const dataJSContent = generateDataJS();
+                const pushSuccess = await pushToGitHub(
+                    'js/data.js',
+                    dataJSContent,
+                    `Update articles: ${title}`
+                );
+                
+                // Push image if uploaded
+                let imagePushSuccess = true;
+                if (currentImageData && currentImageName) {
+                    imagePushSuccess = await pushImageToGitHub(currentImageData, currentImageName);
+                }
+                
+                if (pushSuccess && imagePushSuccess) {
+                    addToLog(`🎉 Successfully pushed all changes to GitHub!`);
+                    showMessage(`Article saved AND pushed to GitHub! View your site in 1-2 minutes.`, 'success');
+                } else {
+                    addToLog(`⚠️ Some files failed to push. Check your GitHub config.`, true);
+                    showMessage(`Article saved locally but GitHub push had issues. Check the log.`, 'error');
+                }
+                
+                resetForm();
+                
+            } catch (error) {
+                addToLog(`❌ Error: ${error.message}`, true);
+                showMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fab fa-github"></i> Save & Push to GitHub';
+            }
         });
         
         function loadArticlesList() {
-            const articlesList = document.getElementById('articlesList');
-            const articleCount = document.getElementById('articleCount');
+            const container = document.getElementById('articlesList');
+            const countSpan = document.getElementById('articleCount');
             
             if (!articles || articles.length === 0) {
-                articlesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-inbox"></i><br>No articles yet. Create your first article!</div>';
-                articleCount.textContent = '(0 articles)';
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">No articles yet</div>';
+                countSpan.textContent = '(0)';
                 return;
             }
             
-            articleCount.textContent = `(${articles.length} articles)`;
-            
-            articlesList.innerHTML = articles.slice().reverse().map(article => `
+            countSpan.textContent = `(${articles.length})`;
+            container.innerHTML = articles.slice().reverse().map(article => `
                 <div class="article-item">
                     <div class="article-info">
                         <h3>#${article.id} - ${article.title}</h3>
-                        <p>${article.description.substring(0, 100)}${article.description.length > 100 ? '...' : ''}</p>
-                        <small><i class="fas fa-tag"></i> ${article.category} | <i class="far fa-calendar"></i> ${article.date}</small>
+                        <p>${article.description.substring(0, 100)}</p>
+                        <small>${article.category} | ${article.date}</small>
                     </div>
                     <div class="article-actions">
-                        <button onclick="window.editArticleById(${article.id})" style="background: #28a745;">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button onclick="window.deleteArticleById(${article.id})" style="background: #dc3545;">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
+                        <button onclick="window.editArticle(${article.id})" style="background:#28a745;">Edit</button>
+                        <button onclick="window.deleteArticle(${article.id})" style="background:#dc3545;">Delete</button>
                     </div>
                 </div>
             `).join('');
         }
         
-        window.editArticleById = function(id) {
+        window.editArticle = function(id) {
             const article = articles.find(a => a.id === id);
             if (article) {
                 document.getElementById('title').value = article.title;
@@ -879,35 +794,43 @@
                 document.getElementById('category').value = article.category;
                 document.getElementById('date').value = article.date;
                 document.getElementById('imageUrl').value = article.imageUrl;
-                document.getElementById('alt').value = article.alt || '';
                 document.getElementById('fullContent').value = article.fullContent || '';
                 currentEditId = article.id;
                 document.getElementById('formTitle').textContent = `Edit Article #${article.id}`;
-                updatePreviewWithImage(article.imageUrl);
+                updatePreview();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                showMessage(`✏️ Editing: ${article.title}`, 'info');
             }
         };
         
-        window.deleteArticleById = function(id) {
+        window.deleteArticle = async function(id) {
             const article = articles.find(a => a.id === id);
-            if (article && confirm(`Delete "${article.title}"?\n\nThis action cannot be undone.`)) {
+            if (article && confirm(`Delete "${article.title}"?`)) {
                 const index = articles.findIndex(a => a.id === id);
-                if (index !== -1) {
-                    articles.splice(index, 1);
-                    saveArticles();
-                    loadArticlesList();
-                    showMessage(`🗑️ Article "${article.title}" deleted successfully`, 'success');
-                    
-                    // Refresh main site after deletion
-                    setTimeout(() => refreshMainSite(), 300);
-                    
-                    if (currentEditId === id) {
-                        resetForm();
-                    }
-                }
+                articles.splice(index, 1);
+                saveArticles();
+                loadArticlesList();
+                showMessage(`Deleted "${article.title}"`, 'success');
+                if (currentEditId === id) resetForm();
+                
+                // Push deletion to GitHub
+                addToLog(`🗑️ Deleting article, pushing changes...`);
+                const dataJSContent = generateDataJS();
+                await pushToGitHub('js/data.js', dataJSContent, `Delete article: ${article.title}`);
+                addToLog(`✅ Deletion pushed to GitHub`);
             }
         };
+        
+        function resetForm() {
+            document.getElementById('articleForm').reset();
+            currentEditId = null;
+            currentImageData = null;
+            currentImageName = null;
+            document.getElementById('formTitle').textContent = 'Add New Article';
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('imageUrl').value = '';
+            updatePreview();
+        }
         
         document.getElementById('resetBtn').addEventListener('click', resetForm);
         document.getElementById('title').addEventListener('input', updatePreview);
@@ -918,16 +841,15 @@
         
         loadArticlesFromStorage();
         setupImageUpload();
-        loadExistingImages();
         resetForm();
         loadArticlesList();
         
-        console.log('✅ Admin panel ready with auto-refresh! Current articles:', articles.length);
-        
-        window.clearUploadedImage = clearUploadedImage;
-        window.editArticleById = editArticleById;
-        window.deleteArticleById = deleteArticleById;
-        window.refreshMainSite = refreshMainSite;
+        addToLog('🚀 Admin panel ready with auto Git push!');
+        if (!gitConfig.token || !gitConfig.repo) {
+            addToLog('⚠️ Please configure your GitHub token and repo above to enable auto-push', true);
+        } else {
+            addToLog('✅ GitHub configured and ready!');
+        }
     </script>
 </body>
 </html>
