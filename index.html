@@ -1,497 +1,933 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NewsFlash · Modern News Website</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="CSS/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsFlash - Admin Panel with Live Sync</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .view-site-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .view-site-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .sync-status {
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .form-section, .preview-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #e8e8ff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .image-preview-area {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .uploaded-image-preview {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .uploaded-image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .existing-images {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .existing-image-item {
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .existing-image-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .existing-image-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid transparent;
+        }
+        
+        .existing-image-item.selected img {
+            border-color: #28a745;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-sync {
+            background: #28a745;
+        }
+        
+        .article-list {
+            margin-top: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        .article-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .article-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .article-info {
+            flex: 1;
+        }
+        
+        .article-info h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .article-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .article-info small {
+            color: #999;
+        }
+        
+        .article-actions button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .preview-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .preview-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+        
+        .preview-card .preview-content {
+            padding: 20px;
+        }
+        
+        .preview-category {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: 15px;
+            font-size: 14px;
+        }
+        
+        .live-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-panel {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        .path-hint {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+        }
+        
+        .iframe-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .iframe-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-
-<!-- HEADER -->
-<div class="site-header">
-  <div class="container header-flex">
-    <div class="logo-area" id="homeLogo">
-      <div class="logo-icon"><i class="fas fa-newspaper"></i></div>
-      <div class="logo-text">
-        <h1>NewsFlash</h1>
-        <span>daily news · fresh updates</span>
-      </div>
-    </div>
-    <div class="date-badge"><i class="far fa-calendar-alt"></i><span id="liveDate"></span></div>
-    <button class="theme-toggle" id="themeToggle">
-      <i class="fas fa-moon"></i>
-    </button>
-    <div class="user-menu">
-      <button id="loginBtn" class="login-btn"><i class="fas fa-user"></i> Login</button>
-      <div id="userDropdown" class="user-dropdown">
-        <span id="userNameDisplay" class="user-name"></span>
-        <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="container">
-  <!-- Search & Filters -->
-  <div class="action-bar" id="actionBar">
-    <div class="search-wrapper">
-      <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Search news...">
-      <button id="clearSearchBtn"><i class="fas fa-times-circle"></i></button>
-    </div>
-    <button id="resetAllBtn" class="reset-filters-btn"><i class="fas fa-sliders-h"></i> Reset filters</button>
-  </div>
-
-  <div id="categoriesWrap">
-    <div id="categoryContainer" class="cat-buttons"></div>
-  </div>
-
-  <!-- Ad Banner Top -->
-  <div class="ad-container">
-    <div class="ad-label">— Advertisement —</div>
-    <span>📢 Your ad here - Contact us for advertising</span>
-  </div>
-
-  <!-- News Grid -->
-  <div id="newsGridContainer" class="news-grid"></div>
-
-  <!-- Ad Banner Bottom -->
-  <div class="ad-container">
-    <div class="ad-label">— Advertisement —</div>
-    <span>📢 Support our news - Premium subscriptions available</span>
-  </div>
-
-  <!-- Full Article Page -->
-  <div id="fullArticlePage" class="full-article-page">
-    <button class="back-to-news" id="backToNewsBtn"><i class="fas fa-arrow-left"></i> Back to all news</button>
-    <img id="fullArticleImage" src="" alt="">
-    <h1 id="fullArticleTitle"></h1>
-    <div class="full-article-meta">
-      <span id="fullArticleCategory"></span>
-      <span id="fullArticleDate"></span>
-    </div>
-    <div id="fullArticleContent" class="full-article-content"></div>
-    <div class="related-articles">
-      <h3><i class="fas fa-random"></i> You May Also Like</h3>
-      <div id="relatedArticlesContainer" class="related-grid"></div>
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <p><i class="fas fa-ad"></i> Advertisements support our free news service</p>
-    <p style="margin-top: 8px;">© 2026 NewsFlash — Stay informed, stay ahead</p>
-  </div>
-</footer>
-
-<!-- Login Modal -->
-<div id="loginModal" class="modal-login">
-  <div class="modal-login-content">
-    <span class="close-login">&times;</span>
-    <div class="login-tabs">
-      <button class="tab-btn active" data-tab="login">Login</button>
-      <button class="tab-btn" data-tab="signup">Sign Up</button>
-    </div>
-    <div id="loginForm" class="login-form active">
-      <h3>Welcome Back</h3>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button id="submitLoginBtn">Login</button>
-      <p class="form-message" id="loginMessage"></p>
-    </div>
-    <div id="signupForm" class="login-form">
-      <h3>Create Account</h3>
-      <input type="text" id="signupName" placeholder="Full Name">
-      <input type="email" id="signupEmail" placeholder="Email">
-      <input type="password" id="signupPassword" placeholder="Password (min 6)">
-      <input type="password" id="signupConfirm" placeholder="Confirm Password">
-      <button id="submitSignupBtn">Sign Up</button>
-      <p class="form-message" id="signupMessage"></p>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-// Import from your data.js
-import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
-
-// Wait for data to load
-let newsData = articles;
-
-// Get unique categories
-const categories = ['all', ...new Set(newsData.map(article => article.category))];
-
-// State
-let currentUser = JSON.parse(localStorage.getItem('newsFlashUser')) || null;
-let currentCategory = 'all';
-let searchQuery = '';
-let currentArticle = null;
-
-// Helper Functions
-function formatDate(dateStr) {
-  if (!dateStr) return 'Recent';
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
-  return new Date(dateStr).toLocaleDateString(undefined, options);
-}
-
-function updateDateDisplay() {
-  const liveDate = document.getElementById('liveDate');
-  if (liveDate) {
-    liveDate.innerText = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  }
-}
-
-// Helper to get description (supports both 'description' and 'desc')
-function getDescription(article) {
-  return article.description || article.desc || 'No description available';
-}
-
-// Helper to get content (supports both 'fullContent' and 'content')
-function getContent(article) {
-  return article.fullContent || article.content || 'No content available';
-}
-
-// Helper to get image (supports both 'imageUrl' and 'image')
-function getImage(article) {
-  return article.imageUrl || article.image || 'https://picsum.photos/id/1/400/250';
-}
-
-function escapeHtml(text) {
-  if (!text) return '';
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Render Category Buttons
-function renderCategories() {
-  const categoryContainer = document.getElementById('categoryContainer');
-  if (!categoryContainer) return;
-  
-  categoryContainer.innerHTML = categories.map(cat => `
-    <button class="cat-btn ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}">
-      ${cat === 'all' ? 'All' : cat}
-    </button>
-  `).join('');
-
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentCategory = btn.dataset.cat;
-      renderCategories();
-      renderNewsGrid();
-    });
-  });
-}
-
-// Filter News
-function getFilteredNews() {
-  return newsData.filter(article => {
-    const matchesCategory = currentCategory === 'all' || article.category === currentCategory;
-    const matchesSearch = searchQuery === '' || 
-      (article.title && article.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (getDescription(article).toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (article.category && article.category.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
-}
-
-// Render News Grid
-function renderNewsGrid() {
-  const newsGridContainer = document.getElementById('newsGridContainer');
-  if (!newsGridContainer) return;
-  
-  const filtered = getFilteredNews();
-  
-  console.log('Rendering:', filtered.length, 'articles');
-  
-  if (filtered.length === 0) {
-    newsGridContainer.innerHTML = `<div class="no-results">😕 No news found. Try a different search or category.</div>`;
-    return;
-  }
-  
-  newsGridContainer.innerHTML = filtered.map(article => `
-    <div class="news-card" data-id="${article.id}">
-      <div class="card-img">
-        <img src="${getImage(article)}" 
-             alt="${escapeHtml(article.alt || article.title)}" 
-             loading="lazy"
-             onerror="this.src='https://picsum.photos/id/1/400/250'">
-      </div>
-      <div class="card-content">
-        <span class="meta-cat">${escapeHtml(article.category || 'News')}</span>
-        <h3 class="news-title">${escapeHtml(article.title)}</h3>
-        <p class="news-desc">${escapeHtml(getDescription(article).substring(0, 120))}${getDescription(article).length > 120 ? '...' : ''}</p>
-        <div class="card-footer">
-          <span class="date-info"><i class="far fa-calendar-alt"></i> ${formatDate(article.date)}</span>
-          <button class="read-btn" data-id="${article.id}">Read more <i class="fas fa-arrow-right"></i></button>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-newspaper"></i> NewsFlash Admin Panel</h1>
+                <p>Manage your news articles - with live website preview!</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="sync-status" id="syncStatus">
+                    <i class="fas fa-check-circle"></i> Live Sync Active
+                </div>
+                <a href="index.html" class="view-site-btn" target="_blank" id="viewSiteBtn">
+                    <i class="fas fa-external-link-alt"></i> Open Main Site
+                </a>
+                <button onclick="refreshMainSite()" class="view-site-btn" style="background: rgba(255,255,255,0.2);">
+                    <i class="fas fa-sync-alt"></i> Refresh Site
+                </button>
+            </div>
         </div>
-      </div>
-    </div>
-  `).join('');
-
-  // Add click handlers
-  document.querySelectorAll('.read-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = parseInt(btn.dataset.id);
-      showFullArticle(id);
-    });
-  });
-  
-  document.querySelectorAll('.news-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const id = parseInt(card.dataset.id);
-      showFullArticle(id);
-    });
-  });
-}
-
-// Show Full Article
-function showFullArticle(id) {
-  const article = newsData.find(a => a.id === id);
-  if (!article) return;
-  currentArticle = article;
-
-  const newsGridContainer = document.getElementById('newsGridContainer');
-  const categoriesWrap = document.getElementById('categoriesWrap');
-  const actionBar = document.getElementById('actionBar');
-  const fullArticlePage = document.getElementById('fullArticlePage');
-  
-  if (newsGridContainer) newsGridContainer.style.display = 'none';
-  if (categoriesWrap) categoriesWrap.style.display = 'none';
-  if (actionBar) actionBar.style.display = 'none';
-  if (fullArticlePage) fullArticlePage.classList.add('active');
-
-  document.getElementById('fullArticleImage').src = getImage(article);
-  document.getElementById('fullArticleTitle').innerText = article.title;
-  document.getElementById('fullArticleCategory').innerHTML = `<i class="fas fa-tag"></i> ${article.category}`;
-  document.getElementById('fullArticleDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${formatDate(article.date)}`;
-  
-  const content = getContent(article);
-  document.getElementById('fullArticleContent').innerHTML = `<p>${escapeHtml(content)}</p>`;
-
-  // Related articles
-  const related = newsData.filter(a => a.id !== id && a.category === article.category).slice(0, 3);
-  const relatedContainer = document.getElementById('relatedArticlesContainer');
-  if (relatedContainer) {
-    if (related.length > 0) {
-      relatedContainer.innerHTML = related.map(rel => `
-        <div class="related-card" data-id="${rel.id}">
-          <div class="related-card-img">
-            <img src="${getImage(rel)}" alt="${escapeHtml(rel.alt || rel.title)}" onerror="this.src='https://picsum.photos/id/1/300/150'">
-          </div>
-          <div class="related-card-content">
-            <div class="related-card-category">${rel.category}</div>
-            <div class="related-card-title">${escapeHtml(rel.title)}</div>
-          </div>
+        
+        <div id="messageContainer"></div>
+        
+        <div class="admin-panel">
+            <div class="form-section">
+                <h2><i class="fas fa-plus-circle"></i> <span id="formTitle">Add New Article</span></h2>
+                
+                <form id="articleForm">
+                    <div class="form-group">
+                        <label for="title">Title *</label>
+                        <input type="text" id="title" required placeholder="Enter article title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description / Excerpt *</label>
+                        <textarea id="description" required placeholder="Brief summary of the article (shown in news grid)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="News">📰 News</option>
+                            <option value="Politics">🏛️ Politics</option>
+                            <option value="Technology">💻 Technology</option>
+                            <option value="Business">📈 Business</option>
+                            <option value="Opinion">💭 Opinion</option>
+                            <option value="Sports">⚽ Sports</option>
+                            <option value="Entertainment">🎬 Entertainment</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Upload Image</label>
+                        <div id="uploadArea" class="upload-area">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-text">Click or drag & drop an image here</div>
+                            <div class="upload-hint">Supports JPG, PNG, GIF (Max 5MB)</div>
+                            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                        </div>
+                        <div id="imagePreviewContainer" class="image-preview-area"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-folder-open"></i> Or Select Existing Image</label>
+                        <div id="existingImagesContainer" class="existing-images">
+                            <div style="color: #999; text-align: center;">Loading existing images...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Or Enter Image Path Manually</label>
+                        <input type="text" id="imageUrl" placeholder="img/your-image.jpg">
+                        <div class="path-hint" id="pathHint"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="alt">Image Alt Text</label>
+                        <input type="text" id="alt" placeholder="Description for accessibility and SEO">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fullContent">Full Article Content *</label>
+                        <textarea id="fullContent" rows="8" placeholder="Write your full article here. Use \n\n to create new paragraphs."></textarea>
+                    </div>
+                    
+                    <button type="submit" id="saveBtn"><i class="fas fa-save"></i> Save Article & Update Site</button>
+                    <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset Form</button>
+                </form>
+            </div>
+            
+            <div class="preview-section">
+                <h2><i class="fas fa-eye"></i> Live Preview 
+                    <span class="live-badge">LIVE</span>
+                </h2>
+                <div id="livePreview">
+                    <div class="preview-card">
+                        <img src="https://via.placeholder.com/400x200?text=Preview" alt="Preview">
+                        <div class="preview-content">
+                            <span class="preview-category">Category</span>
+                            <h3 style="margin: 10px 0;">Article Title</h3>
+                            <p style="color: #666;">Your article description will appear here...</p>
+                            <small style="color: #999;">YYYY-MM-DD</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="iframe-container">
+                    <h4 style="padding: 10px; background: #f8f9fa; margin: 0; border-bottom: 1px solid #ddd;">
+                        <i class="fas fa-globe"></i> Main Website Preview
+                    </h4>
+                    <iframe id="mainSitePreview" src="index.html" title="Main Website Preview"></iframe>
+                </div>
+            </div>
         </div>
-      `).join('');
-
-      document.querySelectorAll('.related-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const relId = parseInt(card.dataset.id);
-          showFullArticle(relId);
+        
+        <div class="article-list">
+            <h2><i class="fas fa-list"></i> All Articles 
+                <span class="stats" id="articleCount"></span>
+            </h2>
+            <div id="articlesList"></div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
+        
+        let currentEditId = null;
+        let currentUploadedImage = null;
+        let currentImagePath = '';
+        
+        // Function to refresh the main site preview
+        window.refreshMainSite = function() {
+            const iframe = document.getElementById('mainSitePreview');
+            if (iframe) {
+                const currentSrc = iframe.src;
+                iframe.src = currentSrc;
+                showMessage('Main website preview refreshed!', 'success');
+            }
+            // Also try to reload the actual index.html data
+            if (window.opener && !window.opener.closed) {
+                try {
+                    window.opener.location.reload();
+                } catch(e) {}
+            }
+        };
+        
+        // Function to open main site with cache bust
+        document.getElementById('viewSiteBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open('index.html?t=' + Date.now(), '_blank');
         });
-      });
-    } else {
-      relatedContainer.innerHTML = '<p style="padding:20px; text-align:center;">No related articles found.</p>';
-    }
-  }
-}
-
-// Back to news
-document.getElementById('backToNewsBtn')?.addEventListener('click', () => {
-  const newsGridContainer = document.getElementById('newsGridContainer');
-  const categoriesWrap = document.getElementById('categoriesWrap');
-  const actionBar = document.getElementById('actionBar');
-  const fullArticlePage = document.getElementById('fullArticlePage');
-  
-  if (newsGridContainer) newsGridContainer.style.display = 'grid';
-  if (categoriesWrap) categoriesWrap.style.display = 'block';
-  if (actionBar) actionBar.style.display = 'flex';
-  if (fullArticlePage) fullArticlePage.classList.remove('active');
-  currentArticle = null;
-});
-
-// Search
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-  searchQuery = e.target.value;
-  renderNewsGrid();
-});
-
-document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
-  document.getElementById('searchInput').value = '';
-  searchQuery = '';
-  renderNewsGrid();
-});
-
-document.getElementById('resetAllBtn')?.addEventListener('click', () => {
-  document.getElementById('searchInput').value = '';
-  searchQuery = '';
-  currentCategory = 'all';
-  renderCategories();
-  renderNewsGrid();
-});
-
-// Logo
-document.getElementById('homeLogo')?.addEventListener('click', () => {
-  if (currentArticle) {
-    document.getElementById('newsGridContainer').style.display = 'grid';
-    document.getElementById('categoriesWrap').style.display = 'block';
-    document.getElementById('actionBar').style.display = 'flex';
-    document.getElementById('fullArticlePage').classList.remove('active');
-    currentArticle = null;
-  } else {
-    document.getElementById('searchInput').value = '';
-    searchQuery = '';
-    currentCategory = 'all';
-    renderCategories();
-    renderNewsGrid();
-  }
-});
-
-// Theme
-function initTheme() {
-  const savedTheme = localStorage.getItem('theme');
-  const themeToggle = document.getElementById('themeToggle');
-  if (savedTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-  }
-}
-
-document.getElementById('themeToggle')?.addEventListener('click', () => {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const themeToggle = document.getElementById('themeToggle');
-  if (currentTheme === 'dark') {
-    document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('theme', 'light');
-    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-  } else {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
-    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-  }
-});
-
-// User
-function updateUserUI() {
-  const loginBtn = document.getElementById('loginBtn');
-  const userNameDisplay = document.getElementById('userNameDisplay');
-  if (currentUser && loginBtn) {
-    loginBtn.innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
-    loginBtn.classList.add('logged-in');
-    if (userNameDisplay) userNameDisplay.innerText = currentUser.name;
-  } else if (loginBtn) {
-    loginBtn.innerHTML = `<i class="fas fa-user"></i> Login`;
-    loginBtn.classList.remove('logged-in');
-  }
-}
-
-document.getElementById('loginBtn')?.addEventListener('click', () => {
-  if (currentUser) {
-    document.getElementById('userDropdown')?.classList.toggle('show');
-  } else {
-    document.getElementById('loginModal').style.display = 'block';
-  }
-});
-
-document.querySelector('.close-login')?.addEventListener('click', () => {
-  document.getElementById('loginModal').style.display = 'none';
-});
-
-window.addEventListener('click', (e) => {
-  if (e.target === document.getElementById('loginModal')) {
-    document.getElementById('loginModal').style.display = 'none';
-  }
-  if (!e.target.closest('.user-menu')) {
-    document.getElementById('userDropdown')?.classList.remove('show');
-  }
-});
-
-// Login
-document.getElementById('submitLoginBtn')?.addEventListener('click', () => {
-  const email = document.getElementById('loginEmail')?.value;
-  const password = document.getElementById('loginPassword')?.value;
-  const users = JSON.parse(localStorage.getItem('newsFlashUsers')) || [];
-  const user = users.find(u => u.email === email && u.password === password);
-  
-  if (user) {
-    currentUser = { name: user.name, email: user.email };
-    localStorage.setItem('newsFlashUser', JSON.stringify(currentUser));
-    updateUserUI();
-    document.getElementById('loginModal').style.display = 'none';
-    alert(`Welcome back, ${user.name}!`);
-  } else {
-    const msg = document.getElementById('loginMessage');
-    if (msg) msg.innerText = 'Invalid email or password';
-  }
-});
-
-// Signup
-document.getElementById('submitSignupBtn')?.addEventListener('click', () => {
-  const name = document.getElementById('signupName')?.value;
-  const email = document.getElementById('signupEmail')?.value;
-  const password = document.getElementById('signupPassword')?.value;
-  const confirm = document.getElementById('signupConfirm')?.value;
-  
-  if (password !== confirm) {
-    const msg = document.getElementById('signupMessage');
-    if (msg) msg.innerText = 'Passwords do not match';
-    return;
-  }
-  
-  const users = JSON.parse(localStorage.getItem('newsFlashUsers')) || [];
-  if (users.find(u => u.email === email)) {
-    const msg = document.getElementById('signupMessage');
-    if (msg) msg.innerText = 'Email already registered';
-    return;
-  }
-  
-  users.push({ name, email, password });
-  localStorage.setItem('newsFlashUsers', JSON.stringify(users));
-  currentUser = { name, email };
-  localStorage.setItem('newsFlashUser', JSON.stringify(currentUser));
-  updateUserUI();
-  document.getElementById('loginModal').style.display = 'none';
-  alert(`Account created! Welcome, ${name}!`);
-});
-
-// Logout
-document.getElementById('logoutBtn')?.addEventListener('click', () => {
-  currentUser = null;
-  localStorage.removeItem('newsFlashUser');
-  updateUserUI();
-  document.getElementById('userDropdown')?.classList.remove('show');
-  alert('Logged out successfully');
-});
-
-// Tab switching
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.dataset.tab;
-    document.getElementById('loginForm').classList.toggle('active', tab === 'login');
-    document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
-  });
-});
-
-// Initialize
-function init() {
-  console.log('🚀 NewsFlash Initialized with', newsData.length, 'articles');
-  updateDateDisplay();
-  renderCategories();
-  renderNewsGrid();
-  updateUserUI();
-  initTheme();
-}
-
-init();
-</script>
+        
+        function showMessage(message, type = 'success') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 4000);
+        }
+        
+        function generateNewId() {
+            if (!articles || articles.length === 0) return 1;
+            return Math.max(...articles.map(a => a.id)) + 1;
+        }
+        
+        async function loadExistingImages() {
+            const container = document.getElementById('existingImagesContainer');
+            const knownImages = ['1.jpg', '2.jpg', '10.jpg', '14.jpg', '15.jpg', '16.jpg', 'ID_9.png', 'logo.png'];
+            const detectedImages = [];
+            
+            for (let i = 1; i <= 30; i++) {
+                const testUrl = `img/${i}.jpg`;
+                try {
+                    const response = await fetch(testUrl, { method: 'HEAD' });
+                    if (response.ok) detectedImages.push(`${i}.jpg`);
+                } catch(e) {}
+            }
+            
+            const allImages = [...new Set([...knownImages, ...detectedImages])];
+            
+            if (allImages.length === 0) {
+                container.innerHTML = '<div style="color: #999; text-align: center;">No existing images found. Upload one first!</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="margin-bottom: 10px; color: #666; font-size: 12px;">Click to select an existing image:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    ${allImages.map(img => `
+                        <div class="existing-image-item" data-path="img/${img}">
+                            <img src="img/${img}?t=${Date.now()}" alt="${img}" onerror="this.parentElement.style.display='none'">
+                            <div style="font-size: 10px; text-align: center;">${img}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.querySelectorAll('.existing-image-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const path = el.dataset.path;
+                    selectExistingImage(path);
+                    document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                });
+            });
+        }
+        
+        function selectExistingImage(path) {
+            currentImagePath = path;
+            document.getElementById('imageUrl').value = path;
+            document.getElementById('pathHint').innerHTML = `<i class="fas fa-check-circle"></i> Selected: ${path}`;
+            currentUploadedImage = null;
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            updatePreviewWithImage(path);
+            showMessage(`Selected image: ${path}`, 'info');
+        }
+        
+        function setupImageUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const imageFile = document.getElementById('imageFile');
+            
+            uploadArea.addEventListener('click', () => imageFile.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleImageFile(e.dataTransfer.files[0]);
+                }
+            });
+            imageFile.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImageFile(e.target.files[0]);
+                }
+            });
+        }
+        
+        function handleImageFile(file) {
+            if (!file.type.match('image.*')) {
+                showMessage('Please upload an image file', 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('Image too large! Max 5MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                currentUploadedImage = {
+                    data: imageData,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                };
+                
+                const timestamp = Date.now();
+                const ext = file.name.split('.').pop();
+                const filename = `upload_${timestamp}.${ext}`;
+                currentImagePath = `img/${filename}`;
+                
+                const container = document.getElementById('imagePreviewContainer');
+                container.innerHTML = `
+                    <div class="uploaded-image-preview">
+                        <img src="${imageData}" alt="Uploaded">
+                        <div class="remove-image" onclick="clearUploadedImage()">×</div>
+                    </div>
+                    <div style="font-size: 12px; color: #666;">
+                        <i class="fas fa-check-circle" style="color: #28a745;"></i> Ready to save: ${filename}
+                    </div>
+                `;
+                
+                document.getElementById('imageUrl').value = currentImagePath;
+                document.getElementById('pathHint').innerHTML = `<i class="fas fa-upload"></i> New image ready: ${filename}`;
+                updatePreviewWithImage(imageData);
+                showMessage(`Image loaded! Will be saved as ${filename}`, 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        window.clearUploadedImage = function() {
+            currentUploadedImage = null;
+            currentImagePath = '';
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('pathHint').innerHTML = '';
+            showMessage('Image cleared', 'info');
+        };
+        
+        function updatePreviewWithImage(imageSrc) {
+            const title = document.getElementById('title').value || 'Article Title';
+            const description = document.getElementById('description').value || 'Article description will appear here...';
+            const category = document.getElementById('category').value || 'Category';
+            const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+            
+            const preview = document.getElementById('livePreview');
+            preview.innerHTML = `
+                <div class="preview-card">
+                    <img src="${imageSrc}" alt="Preview" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
+                    <div class="preview-content">
+                        <span class="preview-category">${category}</span>
+                        <h3 style="margin: 10px 0;">${title.substring(0, 60)}</h3>
+                        <p style="color: #666; line-height: 1.5;">${description.substring(0, 150)}${description.length > 150 ? '...' : ''}</p>
+                        <small style="color: #999;"><i class="far fa-calendar"></i> ${date}</small>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updatePreview() {
+            let imageUrl = document.getElementById('imageUrl').value;
+            if (!imageUrl && currentUploadedImage) {
+                imageUrl = currentUploadedImage.data;
+            } else if (!imageUrl) {
+                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+            }
+            updatePreviewWithImage(imageUrl);
+        }
+        
+        function saveUploadedImage() {
+            if (!currentUploadedImage) return null;
+            
+            const link = document.createElement('a');
+            const filename = currentImagePath.replace('img/', '');
+            link.download = filename;
+            link.href = currentUploadedImage.data;
+            link.click();
+            
+            showMessage(`💾 Image "${filename}" downloaded. Place it in your img/ folder.`, 'info');
+            return currentImagePath;
+        }
+        
+        function resetForm() {
+            document.getElementById('articleForm').reset();
+            currentEditId = null;
+            currentUploadedImage = null;
+            currentImagePath = '';
+            document.getElementById('formTitle').textContent = 'Add New Article';
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('imagePreviewContainer').innerHTML = '';
+            document.getElementById('pathHint').innerHTML = '';
+            document.getElementById('imageUrl').value = '';
+            updatePreview();
+            document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
+        }
+        
+        // Handle form submission with automatic main site refresh
+        document.getElementById('articleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const category = document.getElementById('category').value;
+            const date = document.getElementById('date').value;
+            let imageUrl = document.getElementById('imageUrl').value.trim();
+            const alt = document.getElementById('alt').value.trim() || title;
+            const fullContent = document.getElementById('fullContent').value.trim() || description;
+            
+            if (!title || !description || !category || !date) {
+                showMessage('Please fill in all required fields (*)', 'error');
+                return;
+            }
+            
+            let imageSaveMessage = '';
+            if (currentUploadedImage) {
+                const savedPath = saveUploadedImage();
+                if (savedPath) {
+                    imageUrl = savedPath;
+                    imageSaveMessage = ` Image saved as "${savedPath}".`;
+                }
+            }
+            
+            if (!imageUrl) {
+                imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
+            }
+            
+            if (currentEditId) {
+                const index = articles.findIndex(a => a.id === currentEditId);
+                if (index !== -1) {
+                    articles[index] = {
+                        ...articles[index],
+                        title,
+                        description,
+                        category,
+                        date,
+                        imageUrl,
+                        alt,
+                        fullContent
+                    };
+                    showMessage(`✅ Article "${title}" updated successfully!${imageSaveMessage}`, 'success');
+                }
+                currentEditId = null;
+                document.getElementById('formTitle').textContent = 'Add New Article';
+            } else {
+                const newArticle = {
+                    id: generateNewId(),
+                    title,
+                    description,
+                    category,
+                    date,
+                    imageUrl,
+                    alt,
+                    fullContent
+                };
+                articles.push(newArticle);
+                showMessage(`✅ Article "${title}" added successfully! (ID: ${newArticle.id})${imageSaveMessage}`, 'success');
+            }
+            
+            // Save to localStorage
+            saveArticles();
+            loadArticlesList();
+            
+            // 🔥 AUTO REFRESH THE MAIN WEBSITE 🔥
+            setTimeout(() => {
+                refreshMainSite();
+                showMessage('🔄 Main website has been updated! Check the preview window.', 'success');
+                
+                // Update sync status indicator
+                const syncStatus = document.getElementById('syncStatus');
+                syncStatus.style.background = '#28a745';
+                syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Synced!';
+                setTimeout(() => {
+                    syncStatus.innerHTML = '<i class="fas fa-check-circle"></i> Live Sync Active';
+                }, 2000);
+            }, 500);
+            
+            resetForm();
+            loadExistingImages();
+        });
+        
+        function loadArticlesList() {
+            const articlesList = document.getElementById('articlesList');
+            const articleCount = document.getElementById('articleCount');
+            
+            if (!articles || articles.length === 0) {
+                articlesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-inbox"></i><br>No articles yet. Create your first article!</div>';
+                articleCount.textContent = '(0 articles)';
+                return;
+            }
+            
+            articleCount.textContent = `(${articles.length} articles)`;
+            
+            articlesList.innerHTML = articles.slice().reverse().map(article => `
+                <div class="article-item">
+                    <div class="article-info">
+                        <h3>#${article.id} - ${article.title}</h3>
+                        <p>${article.description.substring(0, 100)}${article.description.length > 100 ? '...' : ''}</p>
+                        <small><i class="fas fa-tag"></i> ${article.category} | <i class="far fa-calendar"></i> ${article.date}</small>
+                    </div>
+                    <div class="article-actions">
+                        <button onclick="window.editArticleById(${article.id})" style="background: #28a745;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="window.deleteArticleById(${article.id})" style="background: #dc3545;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        window.editArticleById = function(id) {
+            const article = articles.find(a => a.id === id);
+            if (article) {
+                document.getElementById('title').value = article.title;
+                document.getElementById('description').value = article.description;
+                document.getElementById('category').value = article.category;
+                document.getElementById('date').value = article.date;
+                document.getElementById('imageUrl').value = article.imageUrl;
+                document.getElementById('alt').value = article.alt || '';
+                document.getElementById('fullContent').value = article.fullContent || '';
+                currentEditId = article.id;
+                document.getElementById('formTitle').textContent = `Edit Article #${article.id}`;
+                updatePreviewWithImage(article.imageUrl);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showMessage(`✏️ Editing: ${article.title}`, 'info');
+            }
+        };
+        
+        window.deleteArticleById = function(id) {
+            const article = articles.find(a => a.id === id);
+            if (article && confirm(`Delete "${article.title}"?\n\nThis action cannot be undone.`)) {
+                const index = articles.findIndex(a => a.id === id);
+                if (index !== -1) {
+                    articles.splice(index, 1);
+                    saveArticles();
+                    loadArticlesList();
+                    showMessage(`🗑️ Article "${article.title}" deleted successfully`, 'success');
+                    
+                    // Refresh main site after deletion
+                    setTimeout(() => refreshMainSite(), 300);
+                    
+                    if (currentEditId === id) {
+                        resetForm();
+                    }
+                }
+            }
+        };
+        
+        document.getElementById('resetBtn').addEventListener('click', resetForm);
+        document.getElementById('title').addEventListener('input', updatePreview);
+        document.getElementById('description').addEventListener('input', updatePreview);
+        document.getElementById('category').addEventListener('change', updatePreview);
+        document.getElementById('date').addEventListener('change', updatePreview);
+        document.getElementById('imageUrl').addEventListener('input', updatePreview);
+        
+        loadArticlesFromStorage();
+        setupImageUpload();
+        loadExistingImages();
+        resetForm();
+        loadArticlesList();
+        
+        console.log('✅ Admin panel ready with auto-refresh! Current articles:', articles.length);
+        
+        window.clearUploadedImage = clearUploadedImage;
+        window.editArticleById = editArticleById;
+        window.deleteArticleById = deleteArticleById;
+        window.refreshMainSite = refreshMainSite;
+    </script>
 </body>
 </html>
