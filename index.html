@@ -54,6 +54,20 @@
     <span>📢 Your ad here - Contact us for advertising</span>
   </div>
 
+  <!-- High Performance Format Ad -->
+  <div class="ad-container" style="padding: 0; background: transparent; overflow: hidden;">
+    <script>
+      atOptions = {
+        'key' : 'ca3013086a4b100db14a5daddf891044',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+    </script>
+    <script src="https://www.highperformanceformat.com/ca3013086a4b100db14a5daddf891044/invoke.js"></script>
+  </div>
+
   <!-- News Grid -->
   <div id="newsGridContainer" class="news-grid"></div>
 
@@ -115,12 +129,28 @@
   </div>
 </div>
 
+<style>
+  /* Additional style for the external ad to fit properly */
+  .ad-container iframe {
+    max-width: 100%;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  /* Center the highperformanceformat ad */
+  .ad-container:has(script) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+
 <script type="module">
 // Import from your data.js
 import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
 
-// Wait for data to load
-let newsData = articles;
+// Load articles from storage or use default
+let newsData = loadArticlesFromStorage();
 
 // Get unique categories
 const categories = ['all', ...new Set(newsData.map(article => article.category))];
@@ -204,9 +234,9 @@ function renderNewsGrid() {
   const newsGridContainer = document.getElementById('newsGridContainer');
   if (!newsGridContainer) return;
   
-  const filtered = getFilteredNews();
-  
-  console.log('Rendering:', filtered.length, 'articles');
+  let filtered = getFilteredNews();
+// Sort by date (newest first)
+    filtered = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
   
   if (filtered.length === 0) {
     newsGridContainer.innerHTML = `<div class="no-results">😕 No news found. Try a different search or category.</div>`;
@@ -426,9 +456,14 @@ document.getElementById('submitLoginBtn')?.addEventListener('click', () => {
     updateUserUI();
     document.getElementById('loginModal').style.display = 'none';
     alert(`Welcome back, ${user.name}!`);
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
   } else {
     const msg = document.getElementById('loginMessage');
     if (msg) msg.innerText = 'Invalid email or password';
+    setTimeout(() => {
+      if (msg) msg.innerText = '';
+    }, 3000);
   }
 });
 
@@ -439,9 +474,21 @@ document.getElementById('submitSignupBtn')?.addEventListener('click', () => {
   const password = document.getElementById('signupPassword')?.value;
   const confirm = document.getElementById('signupConfirm')?.value;
   
+  if (!name || !email || !password) {
+    const msg = document.getElementById('signupMessage');
+    if (msg) msg.innerText = 'Please fill in all fields';
+    return;
+  }
+  
   if (password !== confirm) {
     const msg = document.getElementById('signupMessage');
     if (msg) msg.innerText = 'Passwords do not match';
+    return;
+  }
+  
+  if (password.length < 6) {
+    const msg = document.getElementById('signupMessage');
+    if (msg) msg.innerText = 'Password must be at least 6 characters';
     return;
   }
   
@@ -459,6 +506,12 @@ document.getElementById('submitSignupBtn')?.addEventListener('click', () => {
   updateUserUI();
   document.getElementById('loginModal').style.display = 'none';
   alert(`Account created! Welcome, ${name}!`);
+  
+  // Clear signup form
+  document.getElementById('signupName').value = '';
+  document.getElementById('signupEmail').value = '';
+  document.getElementById('signupPassword').value = '';
+  document.getElementById('signupConfirm').value = '';
 });
 
 // Logout
@@ -478,6 +531,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.getElementById('loginForm').classList.toggle('active', tab === 'login');
     document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+    // Clear messages when switching tabs
+    document.getElementById('loginMessage').innerText = '';
+    document.getElementById('signupMessage').innerText = '';
   });
 });
 
