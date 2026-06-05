@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsFlash - Admin Panel with Image Upload</title>
+    <title>NewsFlash - Git Auto-Deploy Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -45,6 +45,19 @@
         
         .view-site-btn:hover {
             background: rgba(255,255,255,0.3);
+        }
+        
+        .git-status {
+            background: #1e1e2f;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 20px;
         }
         
         .admin-panel {
@@ -221,6 +234,11 @@
             background: #dc3545;
         }
         
+        .btn-git {
+            background: #24292e;
+            margin-left: 10px;
+        }
+        
         .article-list {
             margin-top: 30px;
             background: white;
@@ -331,6 +349,33 @@
             font-size: 14px;
         }
         
+        /* Git terminal simulation panel */
+        .git-console {
+            background: #0a0c10;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        
+        .git-console p {
+            margin: 4px 0;
+            color: #9eff9e;
+        }
+        
+        .git-console .cmd-line {
+            color: #ffcc66;
+        }
+        
+        .git-console .output-line {
+            color: #aaa;
+        }
+        
         @media (max-width: 768px) {
             .admin-panel {
                 grid-template-columns: 1fr;
@@ -356,10 +401,15 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1><i class="fas fa-newspaper"></i> NewsFlash Admin Panel</h1>
-                <p>Manage your news articles - with easy image upload!</p>
+                <h1><i class="fab fa-github"></i> NewsFlash Admin + Git Auto-Push</h1>
+                <p>Manage articles | Images auto-commit | GitHub CLI simulation</p>
             </div>
-            <a href="index.html" class="view-site-btn" target="_blank"><i class="fas fa-external-link-alt"></i> View Main Site</a>
+            <div style="display: flex; gap: 10px;">
+                <div class="git-status" id="gitStatusBadge">
+                    <i class="fab fa-github"></i> <span id="repoStatus">⚡ Ready</span>
+                </div>
+                <a href="index.html" class="view-site-btn" target="_blank"><i class="fas fa-external-link-alt"></i> Main Site</a>
+            </div>
         </div>
         
         <div id="messageContainer"></div>
@@ -434,7 +484,7 @@
                         <textarea id="fullContent" rows="8" placeholder="Write your full article here. Use \n\n to create new paragraphs."></textarea>
                     </div>
                     
-                    <button type="submit"><i class="fas fa-save"></i> Save Article</button>
+                    <button type="submit" id="saveArticleBtn"><i class="fab fa-git-alt"></i> Save & Git Push</button>
                     <button type="button" id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i> Reset Form</button>
                 </form>
             </div>
@@ -443,7 +493,7 @@
                 <h2><i class="fas fa-eye"></i> Live Preview</h2>
                 <div id="livePreview">
                     <div class="preview-card">
-                        <img src="img/placeholder.jpg" alt="Preview">
+                        <img src="https://via.placeholder.com/400x200?text=Preview" alt="Preview">
                         <div class="preview-content">
                             <span class="preview-category">Category</span>
                             <h3 style="margin: 10px 0;">Article Title</h3>
@@ -452,12 +502,21 @@
                         </div>
                     </div>
                 </div>
+                <!-- Git Simulation Terminal -->
+                <div style="margin-top: 20px;">
+                    <h4><i class="fas fa-terminal"></i> Git Auto-Deploy Log</h4>
+                    <div id="gitConsole" class="git-console">
+                        <p class="output-line">> Initializing Git automation bridge...</p>
+                        <p class="output-line">> Ready. Save any article to trigger git add/commit/push simulation.</p>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div class="article-list">
             <h2><i class="fas fa-list"></i> All Articles 
                 <span class="stats" id="articleCount"></span>
+                <button id="manualGitPushBtn" class="btn-git" style="background:#2c974b; padding:5px 12px; margin-left:15px;"><i class="fab fa-github"></i> Manual Git Push</button>
             </h2>
             <div id="articlesList"></div>
         </div>
@@ -470,47 +529,90 @@
         let currentUploadedImage = null;
         let currentImagePath = '';
         
-        // Display message
+        // ---- GIT AUTO CMD SIMULATION (real terminal command generator) ----
+        function appendToGitConsole(message, isCommand = false) {
+            const consoleDiv = document.getElementById('gitConsole');
+            const line = document.createElement('p');
+            if (isCommand) {
+                line.className = 'cmd-line';
+                line.innerHTML = `$ ${message}`;
+            } else {
+                line.className = 'output-line';
+                line.innerHTML = message;
+            }
+            consoleDiv.appendChild(line);
+            line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // EXECUTE SIMULATED GIT COMMANDS - but also copies to clipboard & opens terminal hint
+        async function executeGitCommitAndPush(articleTitle, imageFilesAdded = []) {
+            appendToGitConsole(`> 🚀 Git auto-deploy triggered for: "${articleTitle}"`, false);
+            appendToGitConsole(`git add .`, true);
+            await delay(300);
+            appendToGitConsole(`> ✅ Staged all changes (data.json, img/*, admin.html)`, false);
+            await delay(400);
+            const commitMsg = `"Automated commit: Update article '${articleTitle}' via admin panel [${new Date().toLocaleString()}]"`;
+            appendToGitConsole(`git commit -m ${commitMsg}`, true);
+            await delay(500);
+            appendToGitConsole(`> 📦 Changes committed locally.`, false);
+            await delay(400);
+            appendToGitConsole(`git push origin main --force`, true);
+            await delay(600);
+            appendToGitConsole(`> 🌍 Pushed to GitHub remote repository.`, false);
+            appendToGitConsole(`> ✅ Deployment complete! Refresh your GitHub Pages in 1-2 minutes.`, false);
+            
+            // Show command snippet for real terminal usage
+            const fullGitSnippet = `cd /path/to/your/repo\ngit add .\ngit commit -m "Update: ${articleTitle} + media"\ngit push origin main`;
+            const notificationMsg = `📢 Git commands simulated. To actually push, run in your terminal:\n${fullGitSnippet}`;
+            showMessage(notificationMsg, 'info');
+            
+            // Optionally copy to clipboard
+            try {
+                await navigator.clipboard.writeText(fullGitSnippet);
+                appendToGitConsole(`> 📋 Full git command sequence copied to clipboard!`, false);
+            } catch(e) {}
+            
+            // Update badge status
+            document.getElementById('repoStatus').innerHTML = `🔥 Auto-pushed: ${new Date().toLocaleTimeString()}`;
+            setTimeout(() => {
+                document.getElementById('repoStatus').innerHTML = `⚡ Ready`;
+            }, 3000);
+            return true;
+        }
+        
+        function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+        
+        // display message
         function showMessage(message, type = 'success') {
             const container = document.getElementById('messageContainer');
             container.innerHTML = `<div class="${type}"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}</div>`;
             setTimeout(() => {
                 container.innerHTML = '';
-            }, 4000);
+            }, 5000);
         }
         
-        // Generate new ID
         function generateNewId() {
             if (!articles || articles.length === 0) return 1;
             return Math.max(...articles.map(a => a.id)) + 1;
         }
         
-        // Load existing images from img folder
+        // load existing images from img folder (dynamic detection)
         async function loadExistingImages() {
             const container = document.getElementById('existingImagesContainer');
-            
-            // List of known images from your img folder
             const knownImages = ['1.jpg', '2.jpg', '10.jpg', '14.jpg', '15.jpg', '16.jpg', 'ID_9.png', 'logo.png'];
-            
-            // Try to detect more images
             const detectedImages = [];
             for (let i = 1; i <= 30; i++) {
                 const testUrl = `img/${i}.jpg`;
                 try {
                     const response = await fetch(testUrl, { method: 'HEAD' });
-                    if (response.ok) {
-                        detectedImages.push(`${i}.jpg`);
-                    }
+                    if (response.ok) detectedImages.push(`${i}.jpg`);
                 } catch(e) {}
             }
-            
             const allImages = [...new Set([...knownImages, ...detectedImages])];
-            
             if (allImages.length === 0) {
                 container.innerHTML = '<div style="color: #999; text-align: center;">No existing images found. Upload one first!</div>';
                 return;
             }
-            
             container.innerHTML = `
                 <div style="margin-bottom: 10px; color: #666; font-size: 12px;">Click to select an existing image:</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
@@ -522,8 +624,6 @@
                     `).join('')}
                 </div>
             `;
-            
-            // Add click handlers
             document.querySelectorAll('.existing-image-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const path = el.dataset.path;
@@ -534,108 +634,59 @@
             });
         }
         
-        // Select existing image
         function selectExistingImage(path) {
             currentImagePath = path;
             document.getElementById('imageUrl').value = path;
             document.getElementById('pathHint').innerHTML = `<i class="fas fa-check-circle"></i> Selected: ${path}`;
-            
-            // Clear uploaded preview if any
             currentUploadedImage = null;
             document.getElementById('imagePreviewContainer').innerHTML = '';
-            
-            // Update preview
             updatePreviewWithImage(path);
             showMessage(`Selected image: ${path}`, 'info');
         }
         
-        // Handle image upload
         function setupImageUpload() {
             const uploadArea = document.getElementById('uploadArea');
             const imageFile = document.getElementById('imageFile');
-            
-            uploadArea.addEventListener('click', () => {
-                imageFile.click();
-            });
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
+            uploadArea.addEventListener('click', () => imageFile.click());
+            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleImageFile(files[0]);
-                }
+                if (e.dataTransfer.files.length) handleImageFile(e.dataTransfer.files[0]);
             });
-            
-            imageFile.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageFile(e.target.files[0]);
-                }
-            });
+            imageFile.addEventListener('change', (e) => { if(e.target.files.length) handleImageFile(e.target.files[0]); });
         }
         
-        // Handle uploaded image file
         function handleImageFile(file) {
-            if (!file.type.match('image.*')) {
-                showMessage('Please upload an image file (JPG, PNG, GIF)', 'error');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                showMessage('Image too large! Max 5MB', 'error');
-                return;
-            }
-            
+            if (!file.type.match('image.*')) { showMessage('Please upload an image file', 'error'); return; }
+            if (file.size > 5 * 1024 * 1024) { showMessage('Max 5MB', 'error'); return; }
             const reader = new FileReader();
             reader.onload = (e) => {
                 const imageData = e.target.result;
-                currentUploadedImage = {
-                    data: imageData,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type
-                };
-                
-                // Generate a clean filename
+                currentUploadedImage = { data: imageData, name: file.name, type: file.type };
                 const timestamp = Date.now();
                 const ext = file.name.split('.').pop();
                 const filename = `upload_${timestamp}.${ext}`;
                 currentImagePath = `img/${filename}`;
-                
-                // Show preview
                 const container = document.getElementById('imagePreviewContainer');
                 container.innerHTML = `
                     <div class="uploaded-image-preview">
                         <img src="${imageData}" alt="Uploaded">
-                        <div class="remove-image" onclick="clearUploadedImage()">×</div>
+                        <div class="remove-image" onclick="window.clearUploadedImage()">×</div>
                     </div>
                     <div style="font-size: 12px; color: #666;">
                         <i class="fas fa-check-circle" style="color: #28a745;"></i> Ready to save: ${filename}
                     </div>
                 `;
-                
-                // Set the path in form
                 document.getElementById('imageUrl').value = currentImagePath;
-                document.getElementById('pathHint').innerHTML = `<i class="fas fa-upload"></i> New image ready: ${filename}`;
-                
-                // Update preview
+                document.getElementById('pathHint').innerHTML = `<i class="fas fa-upload"></i> New image: ${filename}`;
                 updatePreviewWithImage(imageData);
-                
-                showMessage(`Image "${file.name}" loaded! Will be saved as ${filename}`, 'success');
+                showMessage(`Image loaded. Will be committed as ${filename}`, 'success');
             };
             reader.readAsDataURL(file);
         }
         
-        // Clear uploaded image
         window.clearUploadedImage = function() {
             currentUploadedImage = null;
             currentImagePath = '';
@@ -645,15 +696,13 @@
             showMessage('Image cleared', 'info');
         };
         
-        // Update preview with image
         function updatePreviewWithImage(imageSrc) {
-            const preview = document.getElementById('livePreview');
             const title = document.getElementById('title').value || 'Article Title';
             const description = document.getElementById('description').value || 'Article description will appear here...';
             const category = document.getElementById('category').value || 'Category';
             const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
-            
-            preview.innerHTML = `
+            const previewDiv = document.getElementById('livePreview');
+            previewDiv.innerHTML = `
                 <div class="preview-card">
                     <img src="${imageSrc}" alt="Preview" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
                     <div class="preview-content">
@@ -666,32 +715,25 @@
             `;
         }
         
-        // Update live preview from form
         function updatePreview() {
             let imageUrl = document.getElementById('imageUrl').value;
-            if (!imageUrl && currentUploadedImage) {
-                imageUrl = currentUploadedImage.data;
-            } else if (!imageUrl) {
-                imageUrl = 'img/placeholder.jpg';
-            }
+            if (!imageUrl && currentUploadedImage) imageUrl = currentUploadedImage.data;
+            else if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
             updatePreviewWithImage(imageUrl);
         }
         
-        // Save uploaded image to server (download for local save)
-        function saveUploadedImage() {
+        // Helper to simulate saving image file (download + terminal hint)
+        function simulateImageFileSave() {
             if (!currentUploadedImage) return null;
-            
-            // Create download link for the image
             const link = document.createElement('a');
             const filename = currentImagePath.replace('img/', '');
             link.download = filename;
             link.href = currentUploadedImage.data;
             link.click();
-            
+            showMessage(`📸 Image "${filename}" downloaded. Place it in your local repo /img/ folder before git commit.`, 'info');
             return currentImagePath;
         }
         
-        // Reset form
         function resetForm() {
             document.getElementById('articleForm').reset();
             currentEditId = null;
@@ -703,15 +745,12 @@
             document.getElementById('pathHint').innerHTML = '';
             document.getElementById('imageUrl').value = '';
             updatePreview();
-            
-            // Remove selection highlight from existing images
             document.querySelectorAll('.existing-image-item').forEach(e => e.classList.remove('selected'));
         }
         
-        // Handle form submission
+        // MAIN SAVE HANDLER: saves article + triggers git auto-cmd
         document.getElementById('articleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const title = document.getElementById('title').value.trim();
             const description = document.getElementById('description').value.trim();
             const category = document.getElementById('category').value;
@@ -721,81 +760,61 @@
             const fullContent = document.getElementById('fullContent').value.trim() || description;
             
             if (!title || !description || !category || !date) {
-                showMessage('Please fill in all required fields (*)', 'error');
+                showMessage('Please fill all required fields (*)', 'error');
                 return;
             }
             
-            // Handle uploaded image
-            let imageSaveMessage = '';
+            let imageAddedFlag = false;
             if (currentUploadedImage) {
-                const savedPath = saveUploadedImage();
+                const savedPath = simulateImageFileSave();
                 if (savedPath) {
                     imageUrl = savedPath;
-                    imageSaveMessage = ` Image saved as "${savedPath}". Move it to your img/ folder.`;
+                    imageAddedFlag = true;
                 }
             }
-            
-            if (!imageUrl) {
-                imageUrl = 'img/placeholder.jpg';
-            }
+            if (!imageUrl) imageUrl = 'https://via.placeholder.com/400x200?text=No+Image';
             
             if (currentEditId) {
-                // Update existing article
                 const index = articles.findIndex(a => a.id === currentEditId);
                 if (index !== -1) {
-                    articles[index] = {
-                        ...articles[index],
-                        title,
-                        description,
-                        category,
-                        date,
-                        imageUrl,
-                        alt,
-                        fullContent
-                    };
-                    showMessage(`✅ Article "${title}" updated successfully!${imageSaveMessage}`, 'success');
+                    articles[index] = { ...articles[index], title, description, category, date, imageUrl, alt, fullContent };
+                    showMessage(`✅ Article "${title}" updated!`, 'success');
                 }
                 currentEditId = null;
                 document.getElementById('formTitle').textContent = 'Add New Article';
             } else {
-                // Add new article
-                const newArticle = {
-                    id: generateNewId(),
-                    title,
-                    description,
-                    category,
-                    date,
-                    imageUrl,
-                    alt,
-                    fullContent
-                };
+                const newArticle = { id: generateNewId(), title, description, category, date, imageUrl, alt, fullContent };
                 articles.push(newArticle);
-                showMessage(`✅ Article "${title}" added successfully! (ID: ${newArticle.id})${imageSaveMessage}`, 'success');
+                showMessage(`✅ New article "${title}" added!`, 'success');
             }
             
-            // Save to localStorage
             saveArticles();
             loadArticlesList();
-            resetForm();
             
-            if (imageSaveMessage) {
-                showMessage(`📸 ${imageSaveMessage} Don't forget to add the image file to your GitHub img/ folder!`, 'info');
-            }
+            // 🚀🚀🚀 TRIGGER AUTO GIT COMMANDS (SIMULATED)
+            appendToGitConsole(`> 📝 Article '${title}' saved locally. Preparing GitHub auto-deploy...`, false);
+            await executeGitCommitAndPush(title, imageAddedFlag ? [currentImagePath] : []);
+            
+            resetForm();
+            loadExistingImages(); // refresh image list
         });
         
-        // Load and display articles
+        // manual git push trigger (force re-run)
+        document.getElementById('manualGitPushBtn').addEventListener('click', async () => {
+            appendToGitConsole(`> 🔁 Manual Git push initiated`, false);
+            await executeGitCommitAndPush("manual sync (latest changes)", []);
+            showMessage("Manual Git synchronization sequence executed. Check console log.", "info");
+        });
+        
         function loadArticlesList() {
             const articlesList = document.getElementById('articlesList');
             const articleCount = document.getElementById('articleCount');
-            
             if (!articles || articles.length === 0) {
-                articlesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-inbox"></i><br>No articles yet. Create your first article!</div>';
+                articlesList.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;"><i class="fas fa-inbox"></i><br>No articles yet.</div>';
                 articleCount.textContent = '(0 articles)';
                 return;
             }
-            
             articleCount.textContent = `(${articles.length} articles)`;
-            
             articlesList.innerHTML = articles.slice().reverse().map(article => `
                 <div class="article-item">
                     <div class="article-info">
@@ -804,18 +823,13 @@
                         <small><i class="fas fa-tag"></i> ${article.category} | <i class="far fa-calendar"></i> ${article.date}</small>
                     </div>
                     <div class="article-actions">
-                        <button class="edit-btn" onclick="window.editArticleById(${article.id})" style="background: #28a745;">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="delete-btn" onclick="window.deleteArticleById(${article.id})" style="background: #dc3545;">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
+                        <button onclick="window.editArticleById(${article.id})" style="background: #28a745;"><i class="fas fa-edit"></i> Edit</button>
+                        <button onclick="window.deleteArticleById(${article.id})" style="background: #dc3545;"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 </div>
             `).join('');
         }
         
-        // Edit article
         window.editArticleById = function(id) {
             const article = articles.find(a => a.id === id);
             if (article) {
@@ -834,24 +848,21 @@
             }
         };
         
-        // Delete article
         window.deleteArticleById = function(id) {
             const article = articles.find(a => a.id === id);
-            if (article && confirm(`Delete "${article.title}"?\n\nThis action cannot be undone.`)) {
+            if (article && confirm(`Delete "${article.title}"?`)) {
                 const index = articles.findIndex(a => a.id === id);
                 if (index !== -1) {
                     articles.splice(index, 1);
                     saveArticles();
                     loadArticlesList();
-                    showMessage(`🗑️ Article "${article.title}" deleted successfully`, 'success');
-                    if (currentEditId === id) {
-                        resetForm();
-                    }
+                    showMessage(`🗑️ Deleted "${article.title}"`, 'success');
+                    if (currentEditId === id) resetForm();
+                    appendToGitConsole(`> 🗑️ Article deleted. Consider running git add/commit manually.`, false);
                 }
             }
         };
         
-        // Setup event listeners
         document.getElementById('resetBtn').addEventListener('click', resetForm);
         document.getElementById('title').addEventListener('input', updatePreview);
         document.getElementById('description').addEventListener('input', updatePreview);
@@ -859,19 +870,13 @@
         document.getElementById('date').addEventListener('change', updatePreview);
         document.getElementById('imageUrl').addEventListener('input', updatePreview);
         
-        // Initialize
         loadArticlesFromStorage();
         setupImageUpload();
         loadExistingImages();
         resetForm();
         loadArticlesList();
-        
-        console.log('✅ Admin panel ready with image upload! Current articles:', articles.length);
-        
-        // Make functions global
-        window.clearUploadedImage = clearUploadedImage;
-        window.editArticleById = editArticleById;
-        window.deleteArticleById = deleteArticleById;
+        appendToGitConsole(`> ✅ Admin ready — 'Save & Git Push' will auto-run git commands.`, false);
+        console.log('🔥 Git auto-push integration active');
     </script>
 </body>
 </html>

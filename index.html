@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
-  <script src="https://pl29629781.effectivecpmnetwork.com/da/e5/95/dae595ff2f05231d36aa03272d049e6a.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NewsFlash · News Website</title>
+  <title>NewsFlash · Modern News Website</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="CSS/style.css">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="shortcut icon" href="favicon.svg">
 </head>
 <body>
 
@@ -24,6 +20,9 @@
       </div>
     </div>
     <div class="date-badge"><i class="far fa-calendar-alt"></i><span id="liveDate"></span></div>
+    <button class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </button>
     <div class="user-menu">
       <button id="loginBtn" class="login-btn"><i class="fas fa-user"></i> Login</button>
       <div id="userDropdown" class="user-dropdown">
@@ -51,19 +50,8 @@
 
   <!-- Ad Banner Top -->
   <div class="ad-container">
-    <div style="text-align: center; width: 100%;">
-      <div class="ad-label">— Advertisement —</div>
-      <script>
-        atOptions = {
-          'key' : 'ca3013086a4b100db14a5daddf891044',
-          'format' : 'iframe',
-          'height' : 90,
-          'width' : 728,
-          'params' : {}
-        };
-      </script>
-      <script src="https://www.highperformanceformat.com/ca3013086a4b100db14a5daddf891044/invoke.js"></script>
-    </div>
+    <div class="ad-label">— Advertisement —</div>
+    <span>📢 Your ad here - Contact us for advertising</span>
   </div>
 
   <!-- News Grid -->
@@ -71,19 +59,8 @@
 
   <!-- Ad Banner Bottom -->
   <div class="ad-container">
-    <div style="text-align: center; width: 100%;">
-      <div class="ad-label">— Advertisement —</div>
-      <script>
-        atOptions = {
-          'key' : 'ca3013086a4b100db14a5daddf891044',
-          'format' : 'iframe',
-          'height' : 90,
-          'width' : 728,
-          'params' : {}
-        };
-      </script>
-      <script src="https://www.highperformanceformat.com/ca3013086a4b100db14a5daddf891044/invoke.js"></script>
-    </div>
+    <div class="ad-label">— Advertisement —</div>
+    <span>📢 Support our news - Premium subscriptions available</span>
   </div>
 
   <!-- Full Article Page -->
@@ -107,7 +84,7 @@
 <footer>
   <div class="container">
     <p><i class="fas fa-ad"></i> Advertisements support our free news service</p>
-    <p style="margin-top: 8px;">© 2025 NewsFlash — Stay informed, stay ahead</p>
+    <p style="margin-top: 8px;">© 2026 NewsFlash — Stay informed, stay ahead</p>
   </div>
 </footer>
 
@@ -138,6 +115,383 @@
   </div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script type="module">
+// Import from your data.js
+import { articles, saveArticles, loadArticlesFromStorage } from './js/data.js';
+
+// Wait for data to load
+let newsData = articles;
+
+// Get unique categories
+const categories = ['all', ...new Set(newsData.map(article => article.category))];
+
+// State
+let currentUser = JSON.parse(localStorage.getItem('newsFlashUser')) || null;
+let currentCategory = 'all';
+let searchQuery = '';
+let currentArticle = null;
+
+// Helper Functions
+function formatDate(dateStr) {
+  if (!dateStr) return 'Recent';
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return new Date(dateStr).toLocaleDateString(undefined, options);
+}
+
+function updateDateDisplay() {
+  const liveDate = document.getElementById('liveDate');
+  if (liveDate) {
+    liveDate.innerText = new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+}
+
+// Helper to get description (supports both 'description' and 'desc')
+function getDescription(article) {
+  return article.description || article.desc || 'No description available';
+}
+
+// Helper to get content (supports both 'fullContent' and 'content')
+function getContent(article) {
+  return article.fullContent || article.content || 'No content available';
+}
+
+// Helper to get image (supports both 'imageUrl' and 'image')
+function getImage(article) {
+  return article.imageUrl || article.image || 'https://picsum.photos/id/1/400/250';
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Render Category Buttons
+function renderCategories() {
+  const categoryContainer = document.getElementById('categoryContainer');
+  if (!categoryContainer) return;
+  
+  categoryContainer.innerHTML = categories.map(cat => `
+    <button class="cat-btn ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}">
+      ${cat === 'all' ? 'All' : cat}
+    </button>
+  `).join('');
+
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentCategory = btn.dataset.cat;
+      renderCategories();
+      renderNewsGrid();
+    });
+  });
+}
+
+// Filter News
+function getFilteredNews() {
+  return newsData.filter(article => {
+    const matchesCategory = currentCategory === 'all' || article.category === currentCategory;
+    const matchesSearch = searchQuery === '' || 
+      (article.title && article.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (getDescription(article).toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (article.category && article.category.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+}
+
+// Render News Grid
+function renderNewsGrid() {
+  const newsGridContainer = document.getElementById('newsGridContainer');
+  if (!newsGridContainer) return;
+  
+  const filtered = getFilteredNews();
+  
+  console.log('Rendering:', filtered.length, 'articles');
+  
+  if (filtered.length === 0) {
+    newsGridContainer.innerHTML = `<div class="no-results">😕 No news found. Try a different search or category.</div>`;
+    return;
+  }
+  
+  newsGridContainer.innerHTML = filtered.map(article => `
+    <div class="news-card" data-id="${article.id}">
+      <div class="card-img">
+        <img src="${getImage(article)}" 
+             alt="${escapeHtml(article.alt || article.title)}" 
+             loading="lazy"
+             onerror="this.src='https://picsum.photos/id/1/400/250'">
+      </div>
+      <div class="card-content">
+        <span class="meta-cat">${escapeHtml(article.category || 'News')}</span>
+        <h3 class="news-title">${escapeHtml(article.title)}</h3>
+        <p class="news-desc">${escapeHtml(getDescription(article).substring(0, 120))}${getDescription(article).length > 120 ? '...' : ''}</p>
+        <div class="card-footer">
+          <span class="date-info"><i class="far fa-calendar-alt"></i> ${formatDate(article.date)}</span>
+          <button class="read-btn" data-id="${article.id}">Read more <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Add click handlers
+  document.querySelectorAll('.read-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      showFullArticle(id);
+    });
+  });
+  
+  document.querySelectorAll('.news-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = parseInt(card.dataset.id);
+      showFullArticle(id);
+    });
+  });
+}
+
+// Show Full Article
+function showFullArticle(id) {
+  const article = newsData.find(a => a.id === id);
+  if (!article) return;
+  currentArticle = article;
+
+  const newsGridContainer = document.getElementById('newsGridContainer');
+  const categoriesWrap = document.getElementById('categoriesWrap');
+  const actionBar = document.getElementById('actionBar');
+  const fullArticlePage = document.getElementById('fullArticlePage');
+  
+  if (newsGridContainer) newsGridContainer.style.display = 'none';
+  if (categoriesWrap) categoriesWrap.style.display = 'none';
+  if (actionBar) actionBar.style.display = 'none';
+  if (fullArticlePage) fullArticlePage.classList.add('active');
+
+  document.getElementById('fullArticleImage').src = getImage(article);
+  document.getElementById('fullArticleTitle').innerText = article.title;
+  document.getElementById('fullArticleCategory').innerHTML = `<i class="fas fa-tag"></i> ${article.category}`;
+  document.getElementById('fullArticleDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${formatDate(article.date)}`;
+  
+  const content = getContent(article);
+  document.getElementById('fullArticleContent').innerHTML = `<p>${escapeHtml(content)}</p>`;
+
+  // Related articles
+  const related = newsData.filter(a => a.id !== id && a.category === article.category).slice(0, 3);
+  const relatedContainer = document.getElementById('relatedArticlesContainer');
+  if (relatedContainer) {
+    if (related.length > 0) {
+      relatedContainer.innerHTML = related.map(rel => `
+        <div class="related-card" data-id="${rel.id}">
+          <div class="related-card-img">
+            <img src="${getImage(rel)}" alt="${escapeHtml(rel.alt || rel.title)}" onerror="this.src='https://picsum.photos/id/1/300/150'">
+          </div>
+          <div class="related-card-content">
+            <div class="related-card-category">${rel.category}</div>
+            <div class="related-card-title">${escapeHtml(rel.title)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.related-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const relId = parseInt(card.dataset.id);
+          showFullArticle(relId);
+        });
+      });
+    } else {
+      relatedContainer.innerHTML = '<p style="padding:20px; text-align:center;">No related articles found.</p>';
+    }
+  }
+}
+
+// Back to news
+document.getElementById('backToNewsBtn')?.addEventListener('click', () => {
+  const newsGridContainer = document.getElementById('newsGridContainer');
+  const categoriesWrap = document.getElementById('categoriesWrap');
+  const actionBar = document.getElementById('actionBar');
+  const fullArticlePage = document.getElementById('fullArticlePage');
+  
+  if (newsGridContainer) newsGridContainer.style.display = 'grid';
+  if (categoriesWrap) categoriesWrap.style.display = 'block';
+  if (actionBar) actionBar.style.display = 'flex';
+  if (fullArticlePage) fullArticlePage.classList.remove('active');
+  currentArticle = null;
+});
+
+// Search
+document.getElementById('searchInput')?.addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  renderNewsGrid();
+});
+
+document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  renderNewsGrid();
+});
+
+document.getElementById('resetAllBtn')?.addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  currentCategory = 'all';
+  renderCategories();
+  renderNewsGrid();
+});
+
+// Logo
+document.getElementById('homeLogo')?.addEventListener('click', () => {
+  if (currentArticle) {
+    document.getElementById('newsGridContainer').style.display = 'grid';
+    document.getElementById('categoriesWrap').style.display = 'block';
+    document.getElementById('actionBar').style.display = 'flex';
+    document.getElementById('fullArticlePage').classList.remove('active');
+    currentArticle = null;
+  } else {
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    currentCategory = 'all';
+    renderCategories();
+    renderNewsGrid();
+  }
+});
+
+// Theme
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const themeToggle = document.getElementById('themeToggle');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+  }
+}
+
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const themeToggle = document.getElementById('themeToggle');
+  if (currentTheme === 'dark') {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+  }
+});
+
+// User
+function updateUserUI() {
+  const loginBtn = document.getElementById('loginBtn');
+  const userNameDisplay = document.getElementById('userNameDisplay');
+  if (currentUser && loginBtn) {
+    loginBtn.innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
+    loginBtn.classList.add('logged-in');
+    if (userNameDisplay) userNameDisplay.innerText = currentUser.name;
+  } else if (loginBtn) {
+    loginBtn.innerHTML = `<i class="fas fa-user"></i> Login`;
+    loginBtn.classList.remove('logged-in');
+  }
+}
+
+document.getElementById('loginBtn')?.addEventListener('click', () => {
+  if (currentUser) {
+    document.getElementById('userDropdown')?.classList.toggle('show');
+  } else {
+    document.getElementById('loginModal').style.display = 'block';
+  }
+});
+
+document.querySelector('.close-login')?.addEventListener('click', () => {
+  document.getElementById('loginModal').style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target === document.getElementById('loginModal')) {
+    document.getElementById('loginModal').style.display = 'none';
+  }
+  if (!e.target.closest('.user-menu')) {
+    document.getElementById('userDropdown')?.classList.remove('show');
+  }
+});
+
+// Login
+document.getElementById('submitLoginBtn')?.addEventListener('click', () => {
+  const email = document.getElementById('loginEmail')?.value;
+  const password = document.getElementById('loginPassword')?.value;
+  const users = JSON.parse(localStorage.getItem('newsFlashUsers')) || [];
+  const user = users.find(u => u.email === email && u.password === password);
+  
+  if (user) {
+    currentUser = { name: user.name, email: user.email };
+    localStorage.setItem('newsFlashUser', JSON.stringify(currentUser));
+    updateUserUI();
+    document.getElementById('loginModal').style.display = 'none';
+    alert(`Welcome back, ${user.name}!`);
+  } else {
+    const msg = document.getElementById('loginMessage');
+    if (msg) msg.innerText = 'Invalid email or password';
+  }
+});
+
+// Signup
+document.getElementById('submitSignupBtn')?.addEventListener('click', () => {
+  const name = document.getElementById('signupName')?.value;
+  const email = document.getElementById('signupEmail')?.value;
+  const password = document.getElementById('signupPassword')?.value;
+  const confirm = document.getElementById('signupConfirm')?.value;
+  
+  if (password !== confirm) {
+    const msg = document.getElementById('signupMessage');
+    if (msg) msg.innerText = 'Passwords do not match';
+    return;
+  }
+  
+  const users = JSON.parse(localStorage.getItem('newsFlashUsers')) || [];
+  if (users.find(u => u.email === email)) {
+    const msg = document.getElementById('signupMessage');
+    if (msg) msg.innerText = 'Email already registered';
+    return;
+  }
+  
+  users.push({ name, email, password });
+  localStorage.setItem('newsFlashUsers', JSON.stringify(users));
+  currentUser = { name, email };
+  localStorage.setItem('newsFlashUser', JSON.stringify(currentUser));
+  updateUserUI();
+  document.getElementById('loginModal').style.display = 'none';
+  alert(`Account created! Welcome, ${name}!`);
+});
+
+// Logout
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  currentUser = null;
+  localStorage.removeItem('newsFlashUser');
+  updateUserUI();
+  document.getElementById('userDropdown')?.classList.remove('show');
+  alert('Logged out successfully');
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+    document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+  });
+});
+
+// Initialize
+function init() {
+  console.log('🚀 NewsFlash Initialized with', newsData.length, 'articles');
+  updateDateDisplay();
+  renderCategories();
+  renderNewsGrid();
+  updateUserUI();
+  initTheme();
+}
+
+init();
+</script>
 </body>
 </html>
