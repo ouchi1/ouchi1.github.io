@@ -163,7 +163,17 @@ export let articles = [
     date: "2026-06-04",
     imageUrl: "img/17.jpg",
     alt: "Government and politics concept image"
+  },
+  {
+    id: 18,
+    title: "DOJ to cancel $1.776B Anti-Weaponization Fund after fierce blowback from GOP in Congress",
+    description: "DOJ to cancel $1.776B Anti-Weaponization Fund after fierce blowback from GOP in Congress",
+    category: "news",
+    date: "2026-06-04",
+    imageUrl: "img/18.jpg",
+    alt: "Government and politics concept image"
   }
+
 ];
 export function saveArticles() {
     localStorage.setItem('newsflash_articles', JSON.stringify(articles));
